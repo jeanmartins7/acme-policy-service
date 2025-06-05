@@ -87,9 +87,8 @@ jobs:
           cache: 'maven'
           
 
-      - name: Build Docker Image
+      - name: Build Native Image with Paketo Buildpacks
         run: |
-          # O nome da imagem pode ser qualquer coisa, já que não será enviada.
-          # Usamos 'local-policy-service' como um placeholder.
-          docker build -t local-policy-service:${{ github.sha }} .
-          echo "Docker image 'local-policy-service:${{ github.sha }}' built successfully locally."
+          # **ATENÇÃO: VERIFIQUE SE ESTE COMANDO ESTÁ EXATAMENTE ASSIM NO SEU ARQUIVO**
+          mvn spring-boot:build-image -Pnative -Dspring-boot.build-image.dockerfile=src/main/resources/docker/Dockerfile -Dspring-boot.build-image.build-context=.
+          echo "Native Image built successfully using Paketo Buildpacks."
