@@ -1,0 +1,38 @@
+{
+  "name": "ACME Insurance Policy Service (Java 17)",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "java.configuration.updateBuildConfiguration": "interactive",
+        "java.debug.settings.forceWarmUp": true,
+        "java.project.referencedLibraries": [
+          "lib/**/*.jar"
+        ],
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "[java]": {
+          "editor.defaultFormatter": "redhat.java"
+        }
+      },
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vscjava.vscode-maven",
+        "Pivotal.vscode-boot-dev-pack",
+        "redhat.vscode-xml",
+        "yzhang.dictionary-completion",
+        "esbenp.prettier-vscode",
+        "streetsidesoftware.code-spell-checker"
+      ]
+    }
+  },
+  "workspaceMount": "Source=${localWorkspaceFolder},Target=/workspace,Type=bind",
+  "workspaceFolder": "/workspace",
+  "appPort": [8081],
+  "postCreateCommand": "mvn clean install",
+  "forwardPorts": [8081],
+  "mounts": [ "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" ]
+}
