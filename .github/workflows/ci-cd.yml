@@ -1,0 +1,101 @@
+name: CI/CD Pipeline - Policy Service
+
+on:
+  push:
+    branches:
+      - dev # Dispara a pipeline em cada push para a branch 'dev'
+  pull_request:
+    branches:
+      - dev # Dispara a pipeline em cada pull request para a branch 'dev'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest # O ambiente de execução do GitHub Actions.
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17 and Maven
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin' # Distribuição Eclipse Temurin (OpenJDK)
+          cache: 'maven' # Cache de dependências Maven para builds mais rápidos
+
+      - name: Cache Maven Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Start Docker Compose Infrastructure for Integration Tests
+        run: |
+          sudo apt-get update && sudo apt-get install -y docker-compose
+          docker-compose up -d dynamodb-local kafka redis schema-registry wiremock jaeger prometheus
+
+      - name: Wait for Infrastructure to be ready
+        run: |
+          echo "Waiting for DynamoDB Local (port 8000)..."
+          timeout 60 bash -c 'until curl -s http://localhost:8000; do echo -n "."; sleep 5; done' || { echo "DynamoDB Local did not start in time."; exit 1; }
+          
+          echo "Waiting for Kafka (port 9092)..."
+          timeout 60 bash -c 'until docker exec kafka kafka-topics --bootstrap-server localhost:9092 --list > /dev/null 2>&1; do echo -n "."; sleep 5; done' || { echo "Kafka did not start in time."; exit 1; }
+          
+          echo "Waiting for Redis (port 6379)..."
+          timeout 60 bash -c 'until docker exec redis redis-cli ping > /dev/null 2>&1; do echo -n "."; sleep 5; done' || { echo "Redis did not start in time."; exit 1; }
+
+          echo "Waiting for Schema Registry (port 8081)..."
+          timeout 60 bash -c 'until curl -s http://localhost:8081/subjects > /dev/null 2>&1; do echo -n "."; sleep 5; done' || { echo "Schema Registry did not start in time."; exit 1; }
+
+          echo "Waiting for WireMock (port 8080)..."
+          timeout 60 bash -c 'until curl -s http://localhost:8080/__admin > /dev/null 2>&1; do echo -n "."; sleep 5; done' || { echo "WireMock did not start in time."; exit 1; }
+          
+          echo "Waiting for Jaeger (port 16686)..."
+          timeout 60 bash -c 'until curl -s http://localhost:16686/api/services > /dev/null 2>&1; do echo -n "."; sleep 5; done' || { echo "Jaeger did not start in time."; exit 1; }
+          
+          echo "All infrastructure services are ready!"
+
+      - name: Build and Test with Maven
+        run: mvn clean install -Dskip.native.build=true
+        env:
+          DYNAMODB_ENDPOINT: http://localhost:8000
+          SPRING_KAFKA_BOOTSTRAP_SERVERS: localhost:9092
+          SPRING_REDIS_HOST: localhost
+          FRAUD_API_BASE_URL: http://localhost:8080
+          SPRING_KAFKA_PROPERTIES_SCHEMA_REGISTRY_URL: http://localhost:8081
+          OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:4317
+
+      - name: Upload JaCoCo Code Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-report
+          path: target/site/jacoco/jacoco.xml
+
+      - name: Stop Docker Compose Infrastructure
+        if: always()
+        run: docker-compose down
+
+  build-docker-image:
+    needs: build-and-test # Esta job depende do sucesso da job 'build-and-test'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+          
+
+      - name: Build Docker Image
+        run: |
+          # O nome da imagem pode ser qualquer coisa, já que não será enviada.
+          # Usamos 'local-policy-service' como um placeholder.
+          docker build -t local-policy-service:${{ github.sha }} .
+          echo "Docker image 'local-policy-service:${{ github.sha }}' built successfully locally."
