@@ -5,7 +5,9 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.5</version> <relativePath/> </parent>
+        <version>3.2.5</version>
+        <relativePath/>
+    </parent>
     <groupId>com.acmeinsurance</groupId>
     <artifactId>policy-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
@@ -14,7 +16,7 @@
 
     <properties>
         <java.version>17</java.version>
-        </properties>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -41,11 +43,11 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        </dependencies>
+    </dependencies>
 
     <dependencyManagement>
         <dependencies>
-            </dependencies>
+        </dependencies>
     </dependencyManagement>
 
     <build>
@@ -65,7 +67,9 @@
                         <env>
                             <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
                             <BP_JVM_VERSION>${java.version}</BP_JVM_VERSION>
-                            <BP_MAVEN_BUILD_ARGUMENTS>-Dspring-boot.repackage.skip=true -Dspring.profiles.active=native</BP_MAVEN_BUILD_ARGUMENTS>
+                            <BP_MAVEN_BUILD_ARGUMENTS>-Dspring-boot.repackage.skip=true
+                                -Dspring.profiles.active=native
+                            </BP_MAVEN_BUILD_ARGUMENTS>
                         </env>
                     </image>
                 </configuration>
@@ -84,7 +88,7 @@
                     </execution>
                 </executions>
             </plugin>
-            </plugins>
+        </plugins>
     </build>
 
     <repositories>
@@ -98,7 +102,7 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        </repositories>
+    </repositories>
     <pluginRepositories>
         <pluginRepository>
             <id>central</id>
