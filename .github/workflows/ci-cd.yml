@@ -60,7 +60,7 @@ jobs:
 
       - name: Build and Test with Maven
         run: mvn clean install -Dskip.native.build=true
-        env:
+
 
       - name: Upload JaCoCo Code Coverage Report
         uses: actions/upload-artifact@v4
