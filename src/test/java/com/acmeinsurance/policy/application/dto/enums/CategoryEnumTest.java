@@ -1,6 +1,6 @@
-package com.acmeinsurance.policy.domain.model;
+package com.acmeinsurance.policy.application.dto.enums;
 
-import com.acmeinsurance.policy.application.dto.model.CategoryEnum;
+import com.acmeinsurance.policy.domain.enums.CategoryEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

@@ -1,5 +1,6 @@
-package com.acmeinsurance.policy.application.dto.model;
+package com.acmeinsurance.policy.application.dto.enums;
 
+import com.acmeinsurance.policy.domain.enums.SalesChannelEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -59,6 +60,6 @@ class SalesChannelEnumTest {
     void fromValueShouldThrowExceptionForInvalidValue() {
         final String invalidChannel = "INVALID_CHANNEL";
         assertThrows(IllegalArgumentException.class, () -> SalesChannelEnum.fromValue(invalidChannel),
-                () -> "Invalid sales channel value: " + invalidChannel + " should throw IllegalArgumentException");
+                "Invalid sales channel value: " + invalidChannel + " should throw IllegalArgumentException");
     }
 }

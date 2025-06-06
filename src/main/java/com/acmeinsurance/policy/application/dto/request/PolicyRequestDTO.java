@@ -1,8 +1,8 @@
 package com.acmeinsurance.policy.application.dto.request;
 
-import com.acmeinsurance.policy.application.dto.model.CategoryEnum;
-import com.acmeinsurance.policy.application.dto.model.PaymentMethodEnum;
-import com.acmeinsurance.policy.application.dto.model.SalesChannelEnum;
+import com.acmeinsurance.policy.domain.enums.CategoryEnum;
+import com.acmeinsurance.policy.domain.enums.PaymentMethodEnum;
+import com.acmeinsurance.policy.domain.enums.SalesChannelEnum;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.DecimalMin;
@@ -24,7 +24,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class PolicyRequest {
+public class PolicyRequestDTO {
 
     @NotNull(message = "Customer ID cannot be null")
     private UUID customerId;

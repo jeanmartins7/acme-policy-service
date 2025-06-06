@@ -1,4 +1,4 @@
-package com.acmeinsurance.policy.application.dto.model;
+package com.acmeinsurance.policy.domain.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

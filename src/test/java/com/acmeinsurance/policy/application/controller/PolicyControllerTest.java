@@ -1,11 +1,11 @@
 package com.acmeinsurance.policy.application.controller;
 
-import com.acmeinsurance.policy.application.dto.model.CategoryEnum;
-import com.acmeinsurance.policy.application.dto.model.PaymentMethodEnum;
-import com.acmeinsurance.policy.application.dto.model.SalesChannelEnum;
-import com.acmeinsurance.policy.application.dto.request.PolicyRequest;
-import com.acmeinsurance.policy.application.dto.response.PolicyResponse;
-import com.acmeinsurance.policy.application.service.PolicyFacade;
+import com.acmeinsurance.policy.domain.enums.CategoryEnum;
+import com.acmeinsurance.policy.domain.enums.PaymentMethodEnum;
+import com.acmeinsurance.policy.domain.enums.SalesChannelEnum;
+import com.acmeinsurance.policy.application.dto.request.PolicyRequestDTO;
+import com.acmeinsurance.policy.application.dto.response.PolicyRequestResponseDTO;
+import com.acmeinsurance.policy.application.service.PolicyRequestFacade;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +32,10 @@ class PolicyControllerTest {
     private WebTestClient webTestClient;
 
     @MockBean
-    private PolicyFacade policyFacade;
+    private PolicyRequestFacade policyRequestFacade;
 
-    private PolicyRequest createValidRequestDTO() {
-        return PolicyRequest.builder()
+    private PolicyRequestDTO createValidRequestDTO() {
+        return PolicyRequestDTO.builder()
                 .customerId(UUID.randomUUID())
                 .productId(1L)
                 .category(CategoryEnum.AUTO)
@@ -48,8 +48,8 @@ class PolicyControllerTest {
                 .build();
     }
 
-    private PolicyResponse createValidResponseDTO(final UUID id, final Instant createdAt) {
-        return PolicyResponse.builder()
+    private PolicyRequestResponseDTO createValidResponseDTO(final UUID id, final Instant createdAt) {
+        return PolicyRequestResponseDTO.builder()
                 .id(id)
                 .createdAt(createdAt)
                 .build();
@@ -60,19 +60,19 @@ class PolicyControllerTest {
     void shouldCreatePolicyRequest() {
         final UUID requestId = UUID.randomUUID();
         final Instant createdAt = Instant.now();
-        final PolicyResponse expectedResponse = createValidResponseDTO(requestId, createdAt);
+        final PolicyRequestResponseDTO expectedResponse = createValidResponseDTO(requestId, createdAt);
 
-        when(policyFacade.createPolicyRequest(any(PolicyRequest.class)))
+        when(policyRequestFacade.createPolicyRequest(any(PolicyRequestDTO.class)))
                 .thenReturn(Mono.just(expectedResponse));
 
-        final PolicyRequest request = createValidRequestDTO();
+        final PolicyRequestDTO request = createValidRequestDTO();
 
         webTestClient.post().uri("/api/solicitations")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(PolicyResponse.class)
+                .expectBody(PolicyRequestResponseDTO.class)
                 .value(response -> {
                     assertEquals(expectedResponse.getId(), response.getId());
                     assertEquals(expectedResponse.getCreatedAt().getEpochSecond(), response.getCreatedAt().getEpochSecond());
@@ -82,7 +82,7 @@ class PolicyControllerTest {
     @Test
     @DisplayName("Should return 400 Bad Request when mandatory fields are missing")
     void shouldReturnBadRequestWhenFieldsAreMissing() {
-        final PolicyRequest request = createValidRequestDTO();
+        final PolicyRequestDTO request = createValidRequestDTO();
         request.setCustomerId(null);
 
         webTestClient.post().uri("/api/solicitations")

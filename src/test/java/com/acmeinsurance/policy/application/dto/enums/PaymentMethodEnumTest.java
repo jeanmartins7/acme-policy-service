@@ -1,5 +1,6 @@
-package com.acmeinsurance.policy.application.dto.model;
+package com.acmeinsurance.policy.application.dto.enums;
 
+import com.acmeinsurance.policy.domain.enums.PaymentMethodEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -59,6 +60,6 @@ class PaymentMethodEnumTest {
     void fromValueShouldThrowExceptionForInvalidValue() {
         final String invalidMethod = "INVALID_METHOD";
         assertThrows(IllegalArgumentException.class, () -> PaymentMethodEnum.fromValue(invalidMethod),
-                () -> "Invalid payment method value: " + invalidMethod + " should throw IllegalArgumentException");
+                "Invalid payment method value: " + invalidMethod + " should throw IllegalArgumentException");
     }
 }
