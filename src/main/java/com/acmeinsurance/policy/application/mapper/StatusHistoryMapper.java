@@ -1,7 +1,7 @@
 package com.acmeinsurance.policy.application.mapper;
 
 import com.acmeinsurance.policy.application.dto.model.StatusHistoryDTO;
-import com.acmeinsurance.policy.domain.model.StatusHistory;
+import com.acmeinsurance.policy.domain.model.StatusHistoryEntry;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -10,7 +10,7 @@ public interface StatusHistoryMapper {
 
     StatusHistoryMapper INSTANCE = Mappers.getMapper(StatusHistoryMapper.class);
 
-    StatusHistoryDTO toDTO(final StatusHistory statusHistory);
+    StatusHistoryDTO toDTO(final StatusHistoryEntry statusHistoryEntry);
 
-    StatusHistory toDomain(final StatusHistoryDTO statusHistoryEntryDTO);
+    StatusHistoryEntry toDomain(final StatusHistoryDTO statusHistoryEntryDTO);
 }

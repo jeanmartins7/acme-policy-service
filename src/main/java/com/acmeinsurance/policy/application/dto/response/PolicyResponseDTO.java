@@ -4,7 +4,7 @@ import com.acmeinsurance.policy.domain.enums.CategoryEnum;
 import com.acmeinsurance.policy.domain.enums.PaymentMethodEnum;
 import com.acmeinsurance.policy.domain.enums.PolicyStatusEnum;
 import com.acmeinsurance.policy.domain.enums.SalesChannelEnum;
-import com.acmeinsurance.policy.domain.model.StatusHistory;
+import com.acmeinsurance.policy.domain.model.StatusHistoryEntry;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -53,5 +53,5 @@ public class PolicyResponseDTO {
 
     private PolicyStatusEnum status;
 
-    private List<StatusHistory> history;
+    private List<StatusHistoryEntry> history;
 }

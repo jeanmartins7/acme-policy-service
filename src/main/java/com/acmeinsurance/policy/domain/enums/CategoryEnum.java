@@ -1,9 +1,10 @@
 package com.acmeinsurance.policy.domain.enums;
 
+import com.acmeinsurance.policy.util.IValueEnum;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum CategoryEnum {
+public enum CategoryEnum implements IValueEnum {
     AUTO("AUTO"),
     VIDA("VIDA"),
     RESIDENCIAL("RESIDENCIAL"),
@@ -15,6 +16,7 @@ public enum CategoryEnum {
         this.value = value;
     }
 
+    @Override
     @JsonValue
     public String getValue() {
         return value;

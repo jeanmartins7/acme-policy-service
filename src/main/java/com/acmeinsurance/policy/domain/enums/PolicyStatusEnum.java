@@ -1,9 +1,10 @@
 package com.acmeinsurance.policy.domain.enums;
 
+import com.acmeinsurance.policy.util.IValueEnum;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum PolicyStatusEnum {
+public enum PolicyStatusEnum implements IValueEnum {
     RECEIVED("RECEIVED"),
     VALIDATED("VALIDATED"),
     PENDING("PENDING"),
@@ -17,6 +18,7 @@ public enum PolicyStatusEnum {
         this.value = value;
     }
 
+    @Override
     @JsonValue
     public String getValue() {
         return value;

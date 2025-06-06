@@ -63,7 +63,7 @@ class PolicyRequestTest {
         assertNotNull(policyRequest.getHistory());
         assertEquals(1, policyRequest.getHistory().size());
 
-        final StatusHistory firstEntry = policyRequest.getHistory().get(0);
+        final StatusHistoryEntry firstEntry = policyRequest.getHistory().get(0);
         assertEquals(PolicyStatusEnum.RECEIVED, firstEntry.getStatus());
         assertNotNull(firstEntry.getTimestamp());
         assertTrue(firstEntry.getTimestamp().isAfter(beforeCreation));
@@ -86,7 +86,7 @@ class PolicyRequestTest {
         assertEquals(newStatus, policyRequest.getStatus());
         assertEquals(initialHistorySize + 1, policyRequest.getHistory().size());
 
-        final StatusHistory newEntry = policyRequest.getHistory().get(policyRequest.getHistory().size() - 1);
+        final StatusHistoryEntry newEntry = policyRequest.getHistory().get(policyRequest.getHistory().size() - 1);
         assertEquals(newStatus, newEntry.getStatus());
         assertNotNull(newEntry.getTimestamp());
         assertTrue(newEntry.getTimestamp().isAfter(beforeUpdate));
@@ -112,7 +112,7 @@ class PolicyRequestTest {
         assertNotNull(policyRequest.getHistory());
         assertEquals(initialHistorySize + 1, policyRequest.getHistory().size());
 
-        final StatusHistory newEntry = policyRequest.getHistory().get(0);
+        final StatusHistoryEntry newEntry = policyRequest.getHistory().get(0);
         assertEquals(newStatus, newEntry.getStatus());
     }
 }

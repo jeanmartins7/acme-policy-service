@@ -14,7 +14,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class StatusHistory {
+public class StatusHistoryEntry {
 
     private PolicyStatusEnum status;
     private Instant timestamp;

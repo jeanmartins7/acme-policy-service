@@ -17,6 +17,7 @@
     <properties>
         <java.version>17</java.version>
         <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
+        <aws.java.sdk.version>2.25.32</aws.java.sdk.version>
     </properties>
 
     <dependencies>
@@ -51,6 +52,18 @@
             <artifactId>mapstruct</artifactId>
             <version>${org.mapstruct.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>dynamodb-enhanced</artifactId>
+            <version>${aws.java.sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>url-connection-client</artifactId>
+            <version>${aws.java.sdk.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -119,9 +132,12 @@
                         <env>
                             <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
                             <BP_JVM_VERSION>${java.version}</BP_JVM_VERSION>
-                            <BP_MAVEN_BUILD_ARGUMENTS>-Dspring-boot.repackage.skip=true
-                                -Dspring.profiles.active=native
-                            </BP_MAVEN_BUILD_ARGUMENTS>
+                            <BP_MAVEN_BUILD_ARGUMENTS>-Dspring-boot.repackage.skip=true -Dspring.profiles.active=native</BP_MAVEN_BUILD_ARGUMENTS>
+                            <BP_NATIVE_IMAGE_BUILD_ARGUMENTS>
+                                --initialize-at-run-time=org.slf4j.LoggerFactory,ch.qos.logback.classic.Logger,ch.qos.logback.core.AsyncAppenderBase,ch.qos.logback.core.OutputStreamAppender,ch.qos.logback.core.status.NopStatusListener,ch.qos.logback.core.util.Loader,ch.qos.logback.core.status.InfoStatus,ch.qos.logback.classic.Level,ch.qos.logback.core.util.StatusPrinter,io.netty,software.amazon.awssdk.http.nio.netty.internal.utils.BetterBytes,io.netty.buffer.PooledByteBufAllocator,io.netty.buffer.UnpooledHeapByteBuf,io.netty.buffer.UnpooledByteBufAllocator$InstrumentedUnpooledUnsafeHeapByteBuf,io.netty.buffer.UnpooledUnsafeHeapByteBuf,io.netty.buffer.PoolChunkList,io.netty.buffer.AbstractDerivedByteBuf,io.netty.buffer.ByteBufUtil,io.netty.buffer.AbstractByteBufAllocator$1,io.netty.buffer.EmptyByteBuf,io.netty.buffer.PoolArena$DirectArena,io.netty.buffer.PoolArena,io.netty.handler.codec.http2.Http2CodecUtil,io.netty.buffer.UnpooledByteBufAllocator$InstrumentedUnpooledUnsafeDirectByteBuf,io.netty.buffer.UnpooledUnsafeDirectByteBuf
+                                --allow-incomplete-classpath
+                                -H:+ReportExceptionStackTraces
+                            </BP_NATIVE_IMAGE_BUILD_ARGUMENTS>
                         </env>
                     </image>
                 </configuration>

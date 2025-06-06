@@ -37,7 +37,7 @@ public class PolicyRequest {
     private Instant createdAt;
     private Instant finishedAt;
     private PolicyStatusEnum status;
-    private List<StatusHistory> history;
+    private List<StatusHistoryEntry> history;
 
     public static PolicyRequest createInitialRequest(
             UUID customerId,
@@ -52,8 +52,8 @@ public class PolicyRequest {
 
         Instant now = Instant.now();
         final PolicyStatusEnum initialStatus = PolicyStatusEnum.RECEIVED;
-        List<StatusHistory> initialHistory = new ArrayList<>();
-        initialHistory.add(StatusHistory.builder()
+        List<StatusHistoryEntry> initialHistory = new ArrayList<>();
+        initialHistory.add(StatusHistoryEntry.builder()
                 .status(initialStatus)
                 .timestamp(now)
                 .build());
@@ -79,7 +79,7 @@ public class PolicyRequest {
         if (this.history == null) {
             this.history = new ArrayList<>();
         }
-        this.history.add(StatusHistory.builder()
+        this.history.add(StatusHistoryEntry.builder()
                 .status(newStatus)
                 .timestamp(Instant.now())
                 .build());

@@ -10,7 +10,7 @@ import com.acmeinsurance.policy.domain.enums.PaymentMethodEnum;
 import com.acmeinsurance.policy.domain.enums.PolicyStatusEnum;
 import com.acmeinsurance.policy.domain.enums.SalesChannelEnum;
 import com.acmeinsurance.policy.domain.model.PolicyRequest;
-import com.acmeinsurance.policy.domain.model.StatusHistory;
+import com.acmeinsurance.policy.domain.model.StatusHistoryEntry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -45,7 +45,7 @@ public class PolicyRequestFacadeImpl implements PolicyRequestFacade {
                 .coverages(requestDTO.getCoverages())
                 .assistances(requestDTO.getAssistances())
                 .status(PolicyStatusEnum.RECEIVED)
-                .history(List.of(StatusHistory.builder().status(PolicyStatusEnum.RECEIVED).timestamp(Instant.now()).build()))
+                .history(List.of(StatusHistoryEntry.builder().status(PolicyStatusEnum.RECEIVED).timestamp(Instant.now()).build()))
                 .build();
 
 
@@ -73,7 +73,7 @@ public class PolicyRequestFacadeImpl implements PolicyRequestFacade {
                 .assistances(List.of("Reboque 24h"))
                 .createdAt(Instant.now().minusSeconds(86400))
                 .status(PolicyStatusEnum.RECEIVED)
-                .history(List.of(StatusHistory.builder().status(PolicyStatusEnum.RECEIVED).timestamp(Instant.now().minusSeconds(86400)).build()))
+                .history(List.of(StatusHistoryEntry.builder().status(PolicyStatusEnum.RECEIVED).timestamp(Instant.now().minusSeconds(86400)).build()))
                 .build();
 
         return Mono.just(mockDomainPolicyRequest)
@@ -100,8 +100,8 @@ public class PolicyRequestFacadeImpl implements PolicyRequestFacade {
                 .assistances(List.of("Carro Reserva"))
                 .createdAt(Instant.now().minusSeconds(172800))
                 .status(PolicyStatusEnum.APPROVED)
-                .history(List.of(StatusHistory.builder().status(PolicyStatusEnum.RECEIVED).timestamp(Instant.now().minusSeconds(172800)).build(),
-                                 StatusHistory.builder().status(PolicyStatusEnum.APPROVED).timestamp(Instant.now().minusSeconds(86400)).build()))
+                .history(List.of(StatusHistoryEntry.builder().status(PolicyStatusEnum.RECEIVED).timestamp(Instant.now().minusSeconds(172800)).build(),
+                                 StatusHistoryEntry.builder().status(PolicyStatusEnum.APPROVED).timestamp(Instant.now().minusSeconds(86400)).build()))
                 .build();
 
         PolicyRequest mockPolicy2 = PolicyRequest.builder()
@@ -117,8 +117,8 @@ public class PolicyRequestFacadeImpl implements PolicyRequestFacade {
                 .assistances(List.of("Assistência Funeral"))
                 .createdAt(Instant.now().minusSeconds(259200))
                 .status(PolicyStatusEnum.PENDING)
-                .history(List.of(StatusHistory.builder().status(PolicyStatusEnum.RECEIVED).timestamp(Instant.now().minusSeconds(259200)).build(),
-                                 StatusHistory.builder().status(PolicyStatusEnum.PENDING).timestamp(Instant.now().minusSeconds(172800)).build()))
+                .history(List.of(StatusHistoryEntry.builder().status(PolicyStatusEnum.RECEIVED).timestamp(Instant.now().minusSeconds(259200)).build(),
+                                 StatusHistoryEntry.builder().status(PolicyStatusEnum.PENDING).timestamp(Instant.now().minusSeconds(172800)).build()))
                 .build();
 
         return Flux.just(mockPolicy1, mockPolicy2)
