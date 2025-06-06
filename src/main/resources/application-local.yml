@@ -1,0 +1,7 @@
+
+aws:
+  dynamodb:
+    endpoint: http://localhost:8000
+  region: us-east-1
+  accessKeyId: mock_access_key
+  secretAccessKey: mock_secret_key
