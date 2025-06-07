@@ -33,7 +33,7 @@ jobs:
 
       - name: Start Docker Compose Infrastructure (DynamoDB Local & Initializer)
         run: |
-          sudo apt-get update && sudo apt-get install -y docker-compose netcat 
+          sudo apt-get update && sudo apt-get install -y docker-compose netcat-openbsd 
           docker compose -f src/main/resources/docker/docker-compose.yml up -d 
 
       - name: Wait for DynamoDB Local Initialization
