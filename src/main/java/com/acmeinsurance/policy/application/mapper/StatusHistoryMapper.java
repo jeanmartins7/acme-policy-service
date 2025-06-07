@@ -1,6 +1,6 @@
 package com.acmeinsurance.policy.application.mapper;
 
-import com.acmeinsurance.policy.application.dto.model.StatusHistoryDTO;
+import com.acmeinsurance.policy.application.dto.policy.model.StatusHistoryDTO;
 import com.acmeinsurance.policy.domain.model.StatusHistoryEntry;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

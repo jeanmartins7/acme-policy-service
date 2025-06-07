@@ -1,4 +1,4 @@
-package com.acmeinsurance.policy.application.dto.request;
+package com.acmeinsurance.policy.application.dto.policy.request;
 
 import com.acmeinsurance.policy.enums.CategoryEnum;
 import com.acmeinsurance.policy.enums.PaymentMethodEnum;

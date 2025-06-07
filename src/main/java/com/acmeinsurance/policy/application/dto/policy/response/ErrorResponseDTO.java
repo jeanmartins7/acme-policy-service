@@ -1,4 +1,4 @@
-package com.acmeinsurance.policy.application.dto.response;
+package com.acmeinsurance.policy.application.dto.policy.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

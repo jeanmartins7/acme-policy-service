@@ -1,5 +1,6 @@
-package com.acmeinsurance.policy.application.dto.response;
+package com.acmeinsurance.policy.infrastructure.integration.fraud.dto.response;
 
+import com.acmeinsurance.policy.enums.ClassificationEnum;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -17,9 +19,16 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class PolicyRequestResponseDTO {
+public class FraudApiResponseDTO {
 
-    private UUID id;
+    private UUID orderId;
 
-    private Instant createdAt;
+    private UUID customerId;
+
+    private Instant analyzedAt;
+
+    private ClassificationEnum classification;
+
+    private List<OccurrenceDTO> occurrences;
 }
+

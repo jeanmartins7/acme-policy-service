@@ -1,6 +1,5 @@
-package com.acmeinsurance.policy.application.dto.model;
+package com.acmeinsurance.policy.infrastructure.integration.fraud.dto.response;
 
-import com.acmeinsurance.policy.enums.PolicyStatusEnum;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -10,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -17,8 +17,17 @@ import java.time.Instant;
 @AllArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class StatusHistoryDTO {
+public class OccurrenceDTO {
 
-    private PolicyStatusEnum status;
-    private Instant timestamp;
+    private UUID id;
+
+    private Long productId;
+
+    private String type;
+
+    private String description;
+
+    private Instant createdAt;
+
+    private Instant updatedAt;
 }

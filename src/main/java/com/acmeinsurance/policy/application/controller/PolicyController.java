@@ -1,8 +1,8 @@
 package com.acmeinsurance.policy.application.controller;
 
-import com.acmeinsurance.policy.application.dto.request.PolicyRequestDTO;
-import com.acmeinsurance.policy.application.dto.response.PolicyRequestResponseDTO;
-import com.acmeinsurance.policy.application.dto.response.PolicyResponseDTO;
+import com.acmeinsurance.policy.application.dto.policy.request.PolicyRequestDTO;
+import com.acmeinsurance.policy.application.dto.policy.response.PolicyRequestResponseDTO;
+import com.acmeinsurance.policy.application.dto.policy.response.PolicyResponseDTO;
 import com.acmeinsurance.policy.application.service.PolicyRequestFacade;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

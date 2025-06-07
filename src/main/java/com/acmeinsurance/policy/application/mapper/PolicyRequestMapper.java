@@ -1,8 +1,8 @@
 package com.acmeinsurance.policy.application.mapper;
 
-import com.acmeinsurance.policy.application.dto.request.PolicyRequestDTO;
-import com.acmeinsurance.policy.application.dto.response.PolicyRequestResponseDTO;
-import com.acmeinsurance.policy.application.dto.response.PolicyResponseDTO;
+import com.acmeinsurance.policy.application.dto.policy.request.PolicyRequestDTO;
+import com.acmeinsurance.policy.application.dto.policy.response.PolicyRequestResponseDTO;
+import com.acmeinsurance.policy.application.dto.policy.response.PolicyResponseDTO;
 import com.acmeinsurance.policy.domain.model.PolicyRequest;
 import com.acmeinsurance.policy.domain.usecase.command.CreatePolicyRequestCommand;
 import org.mapstruct.Mapper;

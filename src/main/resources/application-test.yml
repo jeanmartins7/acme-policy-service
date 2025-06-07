@@ -4,3 +4,7 @@ aws:
   region: "us-east-1"
   accessKeyId: "fakeAccessKeyId"
   secretAccessKey: "fakeSecretAccessKey"
+
+fraud:
+  api:
+    url: "http://localhost:8080"

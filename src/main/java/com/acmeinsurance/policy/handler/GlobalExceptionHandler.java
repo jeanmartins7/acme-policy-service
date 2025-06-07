@@ -1,6 +1,6 @@
 package com.acmeinsurance.policy.handler;
 
-import com.acmeinsurance.policy.application.dto.response.ErrorResponseDTO;
+import com.acmeinsurance.policy.application.dto.policy.response.ErrorResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
