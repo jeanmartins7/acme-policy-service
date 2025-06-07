@@ -31,36 +31,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Start Docker Compose Infrastructure for Integration Tests
+      - name: Start Docker Compose Infrastructure (DynamoDB Local & Initializer)
         run: |
-          sudo apt-get update && sudo apt-get install -y docker-compose
-          docker compose -f src/main/resources/docker/docker-compose.yml up -d dynamodb-local
+          sudo apt-get update && sudo apt-get install -y docker-compose netcat 
+          docker compose -f src/main/resources/docker/docker-compose.yml up -d 
 
-      - name: Wait for Infrastructure to be ready
+      - name: Wait for DynamoDB Local Initialization
         run: |
-          echo "Waiting for DynamoDB Local (port 8000)..."
-          timeout 60 bash -c 'until curl -s http://localhost:8000; do echo -n "."; sleep 5; done' || { echo "DynamoDB Local did not start in time."; exit 1; }
-          echo "All infrastructure services are ready!"
-
-      - name: Create DynamoDB Local Table
-        run: |
-               aws dynamodb create-table \
-                --table-name PolicyRequests \
-                --attribute-definitions \
-                    AttributeName=id,AttributeType=S \
-                    AttributeName=customerId,AttributeType=S \
-                --key-schema \
-                    AttributeName=id,KeyType=HASH \
-                --provisioned-throughput \
-                    ReadCapacityUnits=1,WriteCapacityUnits=1 \
-                --global-secondary-indexes \
-                    'IndexName=customer_id-index,KeySchema=[{AttributeName=customerId,KeyType=HASH}],Projection={ProjectionType=ALL},ProvisionedThroughput={ReadCapacityUnits=1,WriteCapacityUnits=1}' \
-                --endpoint-url http://localhost:8000
-          # Adicionar --no-cli-pager se estiver no GitHub Actions e não quiser paginação
-          # curl para verificar a URL da tabela antes de prosseguir
-          # Adicionar wait para a tabela ficar ativa
-               echo "Waiting for PolicyRequests table to be active..."
-               aws dynamodb wait table-exists --table-name PolicyRequests --endpoint-url http://localhost:8000
 
       - name: Build and Test with Maven
         run: mvn clean install -Dskip.native.build=true
