@@ -1,4 +1,4 @@
-package com.acmeinsurance.policy.application.handler;
+package com.acmeinsurance.policy.handler;
 
 import com.acmeinsurance.policy.application.dto.response.ErrorResponseDTO;
 import org.springframework.http.HttpStatus;

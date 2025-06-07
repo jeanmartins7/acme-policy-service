@@ -1,10 +1,6 @@
 package com.acmeinsurance.policy.infrastructure.persistence.dynamodb;
 
-import com.acmeinsurance.policy.domain.enums.CategoryEnum;
-import com.acmeinsurance.policy.domain.enums.PaymentMethodEnum;
-import com.acmeinsurance.policy.domain.enums.PolicyStatusEnum;
-import com.acmeinsurance.policy.domain.enums.SalesChannelEnum;
-import com.acmeinsurance.policy.util.impl.EnumValueConverter;
+import com.acmeinsurance.policy.infrastructure.persistence.converter.StatusHistoryEntryListConverter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,9 +29,10 @@ public class PolicyRequestDynamoDbEntity {
     private String customerId;
     private String productId;
 
-    private CategoryEnum category;
-    private SalesChannelEnum salesChannel;
-    private PaymentMethodEnum paymentMethod;
+    private String category;
+    private String salesChannel;
+    private String paymentMethod;
+    private String status;
 
     private BigDecimal totalMonthlyPremiumAmount;
     private BigDecimal insuredAmount;
@@ -43,8 +40,6 @@ public class PolicyRequestDynamoDbEntity {
     private List<String> assistances;
     private Instant createdAt;
     private Instant finishedAt;
-
-    private PolicyStatusEnum status;
 
     private List<StatusHistoryEntryEntity> history;
 
@@ -58,25 +53,8 @@ public class PolicyRequestDynamoDbEntity {
         return customerId;
     }
 
-    @DynamoDbConvertedBy(EnumValueConverter.class)
-    public CategoryEnum getCategory() {
-        return category;
+    @DynamoDbConvertedBy(StatusHistoryEntryListConverter.class)
+    public List<StatusHistoryEntryEntity> getHistory() {
+        return history;
     }
-
-    @DynamoDbConvertedBy(EnumValueConverter.class)
-    public SalesChannelEnum getSalesChannel() {
-        return salesChannel;
-    }
-
-    @DynamoDbConvertedBy(EnumValueConverter.class)
-    public PaymentMethodEnum getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    @DynamoDbConvertedBy(EnumValueConverter.class)
-    public PolicyStatusEnum getStatus() {
-        return status;
-    }
-
-
 }

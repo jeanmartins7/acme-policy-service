@@ -1,6 +1,6 @@
 package com.acmeinsurance.policy.application.dto.model;
 
-import com.acmeinsurance.policy.domain.enums.PolicyStatusEnum;
+import com.acmeinsurance.policy.enums.PolicyStatusEnum;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;

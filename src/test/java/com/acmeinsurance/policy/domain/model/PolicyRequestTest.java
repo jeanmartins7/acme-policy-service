@@ -1,9 +1,9 @@
 package com.acmeinsurance.policy.domain.model;
 
-import com.acmeinsurance.policy.domain.enums.CategoryEnum;
-import com.acmeinsurance.policy.domain.enums.PaymentMethodEnum;
-import com.acmeinsurance.policy.domain.enums.PolicyStatusEnum;
-import com.acmeinsurance.policy.domain.enums.SalesChannelEnum;
+import com.acmeinsurance.policy.enums.CategoryEnum;
+import com.acmeinsurance.policy.enums.PaymentMethodEnum;
+import com.acmeinsurance.policy.enums.PolicyStatusEnum;
+import com.acmeinsurance.policy.enums.SalesChannelEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

@@ -1,8 +1,8 @@
 package com.acmeinsurance.policy.application.dto.request;
 
-import com.acmeinsurance.policy.domain.enums.CategoryEnum;
-import com.acmeinsurance.policy.domain.enums.PaymentMethodEnum;
-import com.acmeinsurance.policy.domain.enums.SalesChannelEnum;
+import com.acmeinsurance.policy.enums.CategoryEnum;
+import com.acmeinsurance.policy.enums.PaymentMethodEnum;
+import com.acmeinsurance.policy.enums.SalesChannelEnum;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.DecimalMin;

@@ -1,10 +1,9 @@
-package com.acmeinsurance.policy.domain.enums;
+package com.acmeinsurance.policy.enums;
 
-import com.acmeinsurance.policy.util.IValueEnum;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum PaymentMethodEnum implements IValueEnum {
+public enum PaymentMethodEnum {
     CREDIT_CARD("CREDIT_CARD"),
     DEBIT_CARD("DEBIT_CARD"),
     DEBIT("DEBIT"),
@@ -17,7 +16,6 @@ public enum PaymentMethodEnum implements IValueEnum {
         this.value = value;
     }
 
-    @Override
     @JsonValue
     public String getValue() {
         return value;

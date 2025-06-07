@@ -1,6 +1,6 @@
 package com.acmeinsurance.policy.domain.model;
 
-import com.acmeinsurance.policy.domain.enums.PolicyStatusEnum;
+import com.acmeinsurance.policy.enums.PolicyStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

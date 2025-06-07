@@ -1,8 +1,8 @@
 package com.acmeinsurance.policy.application.controller;
 
-import com.acmeinsurance.policy.domain.enums.CategoryEnum;
-import com.acmeinsurance.policy.domain.enums.PaymentMethodEnum;
-import com.acmeinsurance.policy.domain.enums.SalesChannelEnum;
+import com.acmeinsurance.policy.enums.CategoryEnum;
+import com.acmeinsurance.policy.enums.PaymentMethodEnum;
+import com.acmeinsurance.policy.enums.SalesChannelEnum;
 import com.acmeinsurance.policy.application.dto.request.PolicyRequestDTO;
 import com.acmeinsurance.policy.application.dto.response.PolicyRequestResponseDTO;
 import com.acmeinsurance.policy.application.service.PolicyRequestFacade;

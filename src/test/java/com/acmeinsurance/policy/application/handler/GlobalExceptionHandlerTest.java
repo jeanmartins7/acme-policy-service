@@ -1,6 +1,7 @@
 package com.acmeinsurance.policy.application.handler;
 
 import com.acmeinsurance.policy.application.dto.response.ErrorResponseDTO;
+import com.acmeinsurance.policy.handler.GlobalExceptionHandler;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.MethodParameter;

@@ -11,8 +11,13 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 
 import java.net.URI;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Configuration
 public class DynamoDbConfig {
+
+    private static final Logger log = LoggerFactory.getLogger(DynamoDbConfig.class);
 
     @Value("${aws.dynamodb.endpoint}")
     private String dynamoDbEndpoint;
@@ -27,14 +32,19 @@ public class DynamoDbConfig {
     private String awsSecretAccessKey;
 
     @Bean
-    public DynamoDbEnhancedAsyncClient dynamoDbEnhancedAsyncClient() {
-        DynamoDbAsyncClient dynamoDbAsyncClient = DynamoDbAsyncClient.builder()
+    public DynamoDbAsyncClient dynamoDbAsyncClient() {
+        log.info("Configuring DynamoDbAsyncClient with endpoint: {} and region: {}", dynamoDbEndpoint, awsRegion);
+
+        return DynamoDbAsyncClient.builder()
                 .endpointOverride(URI.create(dynamoDbEndpoint))
                 .region(Region.of(awsRegion))
                 .credentialsProvider(StaticCredentialsProvider.create(
                         AwsBasicCredentials.create(awsAccessKeyId, awsSecretAccessKey)))
                 .build();
+    }
 
+    @Bean
+    public DynamoDbEnhancedAsyncClient dynamoDbEnhancedAsyncClient(final DynamoDbAsyncClient dynamoDbAsyncClient) {
         return DynamoDbEnhancedAsyncClient.builder()
                 .dynamoDbClient(dynamoDbAsyncClient)
                 .build();
