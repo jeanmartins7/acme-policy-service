@@ -50,7 +50,7 @@ public class CreatePolicyRequestUseCaseImpl implements CreatePolicyRequestUseCas
                 .setSalesChannel(savedPolicy.getSalesChannel().getValue())
                 .setPaymentMethod(savedPolicy.getPaymentMethod().getValue())
                 .setTotalMonthlyPremiumAmount(savedPolicy.getTotalMonthlyPremiumAmount())
-                .setInsuredAmount(savedPolicy.getInsuredAmount().toString())
+                .setInsuredAmount(savedPolicy.getInsuredAmount())
                 .setCreatedAt(Instant.ofEpochSecond(savedPolicy.getCreatedAt().toEpochMilli()))
                 .build();
 

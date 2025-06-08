@@ -6,7 +6,10 @@
     {"name": "policyId", "type": {"type": "string", "logicalType": "uuid"}},
     {"name": "paymentTransactionId", "type": {"type": "string", "avro.java.string": "String"}},
     {"name": "status", "type": {"type": "string", "avro.java.string": "String"}},
-    {"name": "amount", "type": {"type": "string", "logicalType": "decimal", "precision": 10, "scale": 2}},
+    {"name": "amount", "type": {"type": "bytes", "logicalType": "decimal", "precision": 10, "scale": 2,
+      "size": 0,
+      "name": ""
+    }},
     {"name": "paymentDate", "type": {"type": "long", "logicalType": "timestamp-millis"}}
   ]
 }
