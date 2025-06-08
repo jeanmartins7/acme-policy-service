@@ -1,6 +1,6 @@
 package com.acmeinsurance.policy.infrastructure.persistence.converter;
 
-import com.acmeinsurance.policy.infrastructure.persistence.dynamodb.StatusHistoryEntryEntity;
+import com.acmeinsurance.policy.infrastructure.persistence.entity.StatusHistoryEntryEntity;
 import software.amazon.awssdk.enhanced.dynamodb.AttributeConverter;
 import software.amazon.awssdk.enhanced.dynamodb.AttributeValueType;
 import software.amazon.awssdk.enhanced.dynamodb.EnhancedType;

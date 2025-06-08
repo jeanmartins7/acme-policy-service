@@ -1,4 +1,4 @@
-package com.acmeinsurance.policy.infrastructure.persistence.dynamodb;
+package com.acmeinsurance.policy.infrastructure.persistence.entity;
 
 import com.acmeinsurance.policy.enums.PolicyStatusEnum;
 import lombok.AllArgsConstructor;

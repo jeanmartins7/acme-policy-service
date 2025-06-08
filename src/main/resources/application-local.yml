@@ -9,8 +9,31 @@ fraud:
   api:
     url: "http://localhost:8080"
 
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: policy-service-group
+    properties:
+      schema.registry.url: http://localhost:8081
+    producer:
+      properties:
+        schema.registry.url: http://localhost:8081
+
+app:
+  event:
+    source-id: "policy-service-instance-01"
+
+policy:
+  kafka:
+    topics:
+      status-notifications: "policy-status-notifications-topic"
+      payment-events: "payment-confirmed-events-topic"
+      subscription-events: "subscription-authorized-events-topic"
+
 logging:
   level:
     com.acmeinsurance.policy: DEBUG
     software.amazon.awssdk: INFO
     org.springframework.cloud.openfeign: DEBUG
+    org.springframework.kafka: DEBUG

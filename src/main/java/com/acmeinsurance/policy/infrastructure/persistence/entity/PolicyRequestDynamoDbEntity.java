@@ -1,4 +1,4 @@
-package com.acmeinsurance.policy.infrastructure.persistence.dynamodb;
+package com.acmeinsurance.policy.infrastructure.persistence.entity;
 
 import com.acmeinsurance.policy.infrastructure.persistence.converter.StatusHistoryEntryListConverter;
 import lombok.AllArgsConstructor;

@@ -1,0 +1,11 @@
+{
+  "type": "record",
+  "name": "PolicyValidatedEvent",
+  "namespace": "com.acmeinsurance.policy.avro",
+  "fields": [
+    {"name": "policyId", "type": {"type": "string", "logicalType": "uuid"}},
+    {"name": "customerId", "type": {"type": "string", "logicalType": "uuid"}},
+    {"name": "validationTimestamp", "type": {"type": "long", "logicalType": "timestamp-millis"}},
+    {"name": "classification", "type": {"type": "string", "avro.java.string": "String"}}
+  ]
+}

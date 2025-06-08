@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   dynamodb-local:
     command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
@@ -31,3 +29,47 @@ services:
       - bash
     command:
       '-c "for f in /tmp/dynamo/*.json; do aws dynamodb create-table --endpoint-url "http://dynamodb-local:8000" --cli-input-json file://"$${f#./}"; done"'
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    hostname: kafka
+    container_name: kafka
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://kafka:9092,CONTROLLER://kafka:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_LOG_DIRS: "/tmp/kraft-kafka-logs"
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+    command: "bash -c \"kafka-storage random-uuid --override-cluster-id && kafka-storage format -t $(kafka-storage random-uuid --override-cluster-id) -c /etc/kafka/kafka.properties -o && kafka-server-start /etc/kafka/kafka.properties\""
+    healthcheck:
+      test: [ "CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list || exit 1" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.4.0
+    hostname: schema-registry
+    container_name: schema-registry
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:9092
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+    depends_on:
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8081/subjects || exit 1" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10

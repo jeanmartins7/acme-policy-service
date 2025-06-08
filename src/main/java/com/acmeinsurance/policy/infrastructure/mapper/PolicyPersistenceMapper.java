@@ -2,12 +2,8 @@ package com.acmeinsurance.policy.infrastructure.mapper;
 
 import com.acmeinsurance.policy.domain.model.PolicyRequest;
 import com.acmeinsurance.policy.domain.model.StatusHistoryEntry;
-import com.acmeinsurance.policy.enums.CategoryEnum;
-import com.acmeinsurance.policy.enums.SalesChannelEnum;
-import com.acmeinsurance.policy.enums.PaymentMethodEnum;
-import com.acmeinsurance.policy.enums.PolicyStatusEnum;
-import com.acmeinsurance.policy.infrastructure.persistence.dynamodb.PolicyRequestDynamoDbEntity;
-import com.acmeinsurance.policy.infrastructure.persistence.dynamodb.StatusHistoryEntryEntity;
+import com.acmeinsurance.policy.infrastructure.persistence.entity.PolicyRequestDynamoDbEntity;
+import com.acmeinsurance.policy.infrastructure.persistence.entity.StatusHistoryEntryEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

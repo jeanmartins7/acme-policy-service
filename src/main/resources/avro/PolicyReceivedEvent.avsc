@@ -1,0 +1,16 @@
+{
+  "type": "record",
+  "name": "PolicyReceivedEvent",
+  "namespace": "com.acmeinsurance.policy.avro",
+  "fields": [
+    {"name": "policyId", "type": {"type": "string", "logicalType": "uuid"}},
+    {"name": "customerId", "type": {"type": "string", "logicalType": "uuid"}},
+    {"name": "productId", "type": "long"},
+    {"name": "category", "type": {"type": "string", "avro.java.string": "String"}},
+    {"name": "salesChannel", "type": {"type": "string", "avro.java.string": "String"}},
+    {"name": "paymentMethod", "type": {"type": "string", "avro.java.string": "String"}},
+    {"name": "totalMonthlyPremiumAmount", "type": {"type": "bytes", "logicalType": "decimal", "precision": 10, "scale": 2}},
+    {"name": "insuredAmount", "type": {"type": "bytes", "logicalType": "decimal", "precision": 10, "scale": 2}},
+    {"name": "createdAt", "type": {"type": "long", "logicalType": "timestamp-millis"}}
+  ]
+}

@@ -3,6 +3,7 @@ package com.acmeinsurance.policy.infrastructure.persistence.dynamodb;
 import com.acmeinsurance.policy.domain.model.PolicyRequest;
 import com.acmeinsurance.policy.domain.repository.PolicyRequestRepository;
 import com.acmeinsurance.policy.infrastructure.mapper.PolicyPersistenceMapper;
+import com.acmeinsurance.policy.infrastructure.persistence.entity.PolicyRequestDynamoDbEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;

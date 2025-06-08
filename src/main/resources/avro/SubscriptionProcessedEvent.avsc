@@ -1,0 +1,11 @@
+{
+  "type": "record",
+  "name": "SubscriptionAuthorizedEvent",
+  "namespace": "com.acmeinsurance.policy.avro",
+  "fields": [
+    {"name": "policyId", "type": {"type": "string", "logicalType": "uuid"}},
+    {"name": "subscriptionId", "type": {"type": "string", "avro.java.string": "String"}},
+    {"name": "authorized", "type": "boolean"},
+    {"name": "authorizationDate", "type": {"type": "long", "logicalType": "timestamp-millis"}}
+  ]
+}

@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
@@ -76,7 +77,7 @@ public class PolicyRequest {
     }
 
     public void updateStatus(final PolicyStatusEnum newStatus) {
-        if (this.history == null) {
+        if (Objects.isNull(history)) {
             this.history = new ArrayList<>();
         }
         this.history.add(StatusHistoryEntry.builder()

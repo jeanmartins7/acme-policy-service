@@ -1,0 +1,12 @@
+{
+  "type": "record",
+  "name": "PaymentProcessedEvent",
+  "namespace": "com.acmeinsurance.policy.avro",
+  "fields": [
+    {"name": "policyId", "type": {"type": "string", "logicalType": "uuid"}},
+    {"name": "paymentTransactionId", "type": {"type": "string", "avro.java.string": "String"}},
+    {"name": "status", "type": {"type": "string", "avro.java.string": "String"}},
+    {"name": "amount", "type": {"type": "string", "logicalType": "decimal", "precision": 10, "scale": 2}},
+    {"name": "paymentDate", "type": {"type": "long", "logicalType": "timestamp-millis"}}
+  ]
+}
