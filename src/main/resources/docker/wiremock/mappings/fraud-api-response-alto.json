@@ -1,0 +1,28 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": "/api/fraudes/solicitacoes/.*/clientes/specific-high-risk-customer"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "orderId": "{{request.pathSegments.[2]}}",
+      "customerId": "{{request.pathSegments.[4]}}",
+      "analyzedAt": "2025-06-08T12:00:00Z",
+      "classification": "ALTO_RISCO",
+      "occurrences": [
+        {
+          "id": "{{randomValue type='UUID'}}",
+          "productId": 54321,
+          "type": "HIGH_RISK_FLAG",
+          "description": "Customer has previous high-risk activity",
+          "createdAt": "2025-06-08T12:00:00Z",
+          "updatedAt": "2025-06-08T12:00:00Z"
+        }
+      ]
+    }
+  }
+}

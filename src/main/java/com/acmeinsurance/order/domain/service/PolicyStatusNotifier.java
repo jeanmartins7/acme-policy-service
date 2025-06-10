@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +29,7 @@ public class PolicyStatusNotifier {
         final PolicyStatusChangedEvent avroEvent = PolicyStatusChangedEvent.newBuilder()
                 .setPolicyId(policyRequest.getId().toString())
                 .setCustomerId(policyRequest.getCustomerId().toString())
-                .setOldStatus(getOldStatus(oldStatus))
+                .setOldStatus(oldStatus.getValue())
                 .setNewStatus(newStatus.getValue())
                 .setChangeTimestamp(LocalDateTime.now().toString())
                 .build();
@@ -39,9 +38,5 @@ public class PolicyStatusNotifier {
                 policyRequest.getId(), oldStatus, newStatus);
 
         return policyEventPublisher.publishEventNotificationStatus(avroEvent, NOTIFICATION_STATUS);
-    }
-
-    private static String getOldStatus(final PolicyStatusEnum oldStatus) {
-        return String.valueOf(Optional.of(oldStatus.getValue()).or(null));
     }
 }

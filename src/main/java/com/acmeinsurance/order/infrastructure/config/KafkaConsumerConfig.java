@@ -2,6 +2,7 @@ package com.acmeinsurance.order.infrastructure.config;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
+import io.confluent.kafka.serializers.subject.RecordNameStrategy;
 import org.apache.avro.AvroRuntimeException;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
@@ -53,6 +54,7 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class);
         props.put(SCHEMA_REGISTRY_URL, env.getProperty("spring.kafka.properties.schema.registry.url", "http://localhost:8081"));
+        props.put("value.subject.name.strategy", RecordNameStrategy.class.getName());
         props.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, EARLIEST);
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, FALSE);

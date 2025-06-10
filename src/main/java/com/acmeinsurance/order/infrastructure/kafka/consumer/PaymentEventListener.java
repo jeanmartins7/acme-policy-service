@@ -5,6 +5,7 @@ import com.acmeinsurance.order.domain.service.PaymentProcessedService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -19,11 +20,9 @@ public class PaymentEventListener {
     private static final Logger log = LoggerFactory.getLogger(PaymentEventListener.class);
 
     private final PaymentProcessedService paymentProcessedService;
+    private final Environment env;
 
-    private static final String PAYMENT_TOPIC = "${policy.kafka.topics.payment-events}";
-    private static final String CONSUMER_GROUP_ID = "${spring.kafka.consumer.group-id}";
-
-    @KafkaListener(topics = PAYMENT_TOPIC, groupId = CONSUMER_GROUP_ID, containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = "${policy.kafka.topics.payment-events}", groupId = "${spring.kafka.consumer.group-id}", containerFactory = "kafkaListenerContainerFactory")
     public void listenPaymentProcessedEvent(
                                              @Payload PaymentProcessedEvent event,
                                              @Header(KafkaHeaders.RECEIVED_KEY) String key,
@@ -33,11 +32,11 @@ public class PaymentEventListener {
                                              Acknowledgment acknowledgment) {
 
         log.info("Received message from topic '{}', key: '{}', offset: {}, eventType: '{}', Avro Payment ID: {}",
-                PAYMENT_TOPIC, key, offset, eventType, event.getPolicyId());
+                env.getProperty("${policy.kafka.topics.payment-events}"), key, offset, eventType, event.getPolicyId());
 
         if (!"PAYMENT_PROCESSED".equals(eventType)) {
             log.warn("Discarding message from topic '{}' with non-matching eventType '{}'. Expected: 'PAYMENT_PROCESSED'. Key: {}",
-                    PAYMENT_TOPIC, eventType, key);
+                    env.getProperty("${policy.kafka.topics.payment-events}"), eventType, key);
             acknowledgment.acknowledge();
             return;
         }

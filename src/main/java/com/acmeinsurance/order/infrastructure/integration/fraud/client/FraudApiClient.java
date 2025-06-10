@@ -14,5 +14,6 @@ public interface FraudApiClient {
     FraudApiResponseDTO getFraudClassification(
             @PathVariable("orderId") final UUID orderId,
             @PathVariable("customerId") final UUID customerId);
-}
 
+
+}

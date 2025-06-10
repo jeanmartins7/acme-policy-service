@@ -2,15 +2,14 @@ package com.acmeinsurance.order.application.dto.enums;
 
 import com.acmeinsurance.order.enums.PolicyStatusEnum;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.params.provider.Arguments.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.of;
 
 class PolicyStatusEnumTest {
 
@@ -61,13 +60,5 @@ class PolicyStatusEnumTest {
                 of(PolicyStatusEnum.REJECTED, "REJECTED"),
                 of(PolicyStatusEnum.CANCELLED, "CANCELLED")
         );
-    }
-
-    @Test
-    @DisplayName("Should throw IllegalArgumentException for invalid PolicyStatus value")
-    void fromValueShouldThrowExceptionForInvalidValue() {
-        final String invalidStatus = "INVALID_STATUS";
-        assertThrows(IllegalArgumentException.class, () -> PolicyStatusEnum.fromValue(invalidStatus),
-                "Invalid status value: " + invalidStatus + " should throw IllegalArgumentException");
     }
 }

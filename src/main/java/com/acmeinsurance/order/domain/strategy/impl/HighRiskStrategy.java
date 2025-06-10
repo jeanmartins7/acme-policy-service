@@ -31,19 +31,19 @@ public class HighRiskStrategy implements FraudRiskStrategy {
 
         evaluators.put(CategoryEnum.VIDA, policy ->
                 BigDecimal.valueOf(DUZENTOS_CINQUENTA_K).compareTo(policy.getInsuredAmount()) < 0 ?
-                        PolicyStatusEnum.APPROVED : PolicyStatusEnum.REJECTED
+                        PolicyStatusEnum.VALIDATED : PolicyStatusEnum.REJECTED
         );
         evaluators.put(CategoryEnum.RESIDENCIAL, policy ->
                 BigDecimal.valueOf(DUZENTOS_CINQUENTA_K).compareTo(policy.getInsuredAmount()) < 0 ?
-                        PolicyStatusEnum.APPROVED : PolicyStatusEnum.REJECTED
+                        PolicyStatusEnum.VALIDATED : PolicyStatusEnum.REJECTED
         );
         evaluators.put(CategoryEnum.AUTO, policy ->
                 BigDecimal.valueOf(CEM_CINQUENTA_K).compareTo(policy.getInsuredAmount()) < 0 ?
-                        PolicyStatusEnum.APPROVED : PolicyStatusEnum.REJECTED
+                        PolicyStatusEnum.VALIDATED : PolicyStatusEnum.REJECTED
         );
         evaluators.put(CategoryEnum.OUTRO, policy ->
                 BigDecimal.valueOf(CEM_VINTE_CINCO_K).compareTo(policy.getInsuredAmount()) < 0 ?
-                        PolicyStatusEnum.APPROVED : PolicyStatusEnum.REJECTED
+                        PolicyStatusEnum.VALIDATED : PolicyStatusEnum.REJECTED
         );
 
     }

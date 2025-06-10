@@ -23,10 +23,14 @@ public class FraudRiskStrategyContext {
     }
 
     public PolicyStatusEnum evaluate(final FraudAnalysisResult fraudResult, final PolicyRequest policy) {
-        FraudRiskStrategy strategy = strategies.get(fraudResult.getClassification());
+
+        final FraudRiskStrategy strategy = strategies.get(fraudResult.getClassification());
+
         if (Objects.isNull(strategy)) {
+
             throw new IllegalArgumentException("No strategy found for FraudClassification: " + fraudResult.getClassification());
         }
+
         return strategy.evaluate(fraudResult, policy);
     }
 }

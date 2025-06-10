@@ -3,13 +3,16 @@ package com.acmeinsurance.order.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import java.util.Arrays;
+
 public enum PolicyStatusEnum {
     RECEIVED("RECEIVED"),
     VALIDATED("VALIDATED"),
     PENDING("PENDING"),
     APPROVED("APPROVED"),
     REJECTED("REJECTED"),
-    CANCELLED("CANCELLED");
+    CANCELLED("CANCELLED"),
+    UNKNOWN("UNKNOWN");
 
     private final String value;
 
@@ -24,12 +27,14 @@ public enum PolicyStatusEnum {
 
     @JsonCreator
     public static PolicyStatusEnum fromValue(final String value) {
-        for (PolicyStatusEnum status : PolicyStatusEnum.values()) {
-            if (status.value.equalsIgnoreCase(value)) {
-                return status;
-            }
+
+        if (value == null) {
+            return UNKNOWN;
         }
-        throw new IllegalArgumentException("Invalid PolicyStatus value: " + value);
+        return Arrays.stream(PolicyStatusEnum.values())
+                .filter(status -> status.value.equalsIgnoreCase(value))
+                .findFirst()
+                .orElse(UNKNOWN);
     }
 
     public static PolicyStatusEnum getNewStatus(final PolicyStatusEnum oldStatus, final String paymentConfirmed,

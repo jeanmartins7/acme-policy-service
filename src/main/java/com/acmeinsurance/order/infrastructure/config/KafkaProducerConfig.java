@@ -1,5 +1,6 @@
 package com.acmeinsurance.order.infrastructure.config;
 
+import io.confluent.kafka.serializers.subject.RecordNameStrategy;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
@@ -34,6 +35,7 @@ public class KafkaProducerConfig {
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
         configProps.put(SCHEMA_REGISTRY_URL, env.getProperty("spring.kafka.properties.schema.registry.url", "http://localhost:8081"));
+        configProps.put("value.subject.name.strategy", RecordNameStrategy.class.getName());
 
         return new DefaultKafkaProducerFactory<>(configProps);
 

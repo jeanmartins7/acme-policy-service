@@ -5,6 +5,7 @@ import com.acmeinsurance.order.domain.usecase.ProcessFraudAnalysisUseCase;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -19,11 +20,9 @@ public class PolicyReceivedEventListener {
     private static final Logger log = LoggerFactory.getLogger(PolicyReceivedEventListener.class);
 
     private final ProcessFraudAnalysisUseCase processFraudAnalysisUseCase;
+    private final Environment env;
 
-    private static final String POLICY_RECEIVED_TOPIC = "${policy.kafka.topics.status-notifications}";
-    private static final String CONSUMER_GROUP_ID = "${spring.kafka.consumer.group-id}";
-
-    @KafkaListener(topics = POLICY_RECEIVED_TOPIC, groupId = CONSUMER_GROUP_ID, containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = "${policy.kafka.topics.status-notifications}", groupId = "${spring.kafka.consumer.group-id}", containerFactory = "kafkaListenerContainerFactory")
     public void listenPolicyReceivedEvent(
             @Payload PolicyReceivedEvent event,
             @Header(KafkaHeaders.RECEIVED_KEY) String key,
@@ -33,11 +32,11 @@ public class PolicyReceivedEventListener {
             Acknowledgment acknowledgment) {
 
         log.info("Received message from topic '{}', key: '{}', offset: {}, eventType: '{}', eventSourceId: '{}', Avro Policy ID: {}",
-                POLICY_RECEIVED_TOPIC, key, offset, eventType, eventSourceId, event.getPolicyId());
+                env.getProperty("${policy.kafka.topics.status-notifications}"), key, offset, eventType, eventSourceId, event.getPolicyId());
 
         if (!"RECEIVED".equals(eventType)) {
             log.warn("Discarding message from topic '{}' with non-matching eventType '{}'. Expected: 'POLICY_RECEIVED'. Key: {}",
-                    POLICY_RECEIVED_TOPIC, eventType, key);
+                    env.getProperty("${policy.kafka.topics.status-notifications}"), eventType, key);
             acknowledgment.acknowledge();
             return;
         }

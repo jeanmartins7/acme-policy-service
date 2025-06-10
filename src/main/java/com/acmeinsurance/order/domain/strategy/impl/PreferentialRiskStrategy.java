@@ -31,19 +31,19 @@ public class PreferentialRiskStrategy implements FraudRiskStrategy {
 
         evaluators.put(CategoryEnum.VIDA, policy ->
                 BigDecimal.valueOf(OITOCENTOS_K).compareTo(policy.getInsuredAmount()) < 0 ?
-                        PolicyStatusEnum.APPROVED : PolicyStatusEnum.REJECTED
+                        PolicyStatusEnum.VALIDATED : PolicyStatusEnum.REJECTED
         );
         evaluators.put(CategoryEnum.RESIDENCIAL, policy ->
                 BigDecimal.valueOf(OITOCENTOS_K).compareTo(policy.getInsuredAmount()) < 0 ?
-                        PolicyStatusEnum.APPROVED : PolicyStatusEnum.REJECTED
+                        PolicyStatusEnum.VALIDATED : PolicyStatusEnum.REJECTED
         );
         evaluators.put(CategoryEnum.AUTO, policy ->
                 BigDecimal.valueOf(QUATROCENTOS_CINQUENTA_K).compareTo(policy.getInsuredAmount()) < 0 ?
-                        PolicyStatusEnum.APPROVED : PolicyStatusEnum.REJECTED
+                        PolicyStatusEnum.VALIDATED : PolicyStatusEnum.REJECTED
         );
         evaluators.put(CategoryEnum.OUTRO, policy ->
                 BigDecimal.valueOf(TREZENTOS_SETENTA_CINCO_K).compareTo(policy.getInsuredAmount()) < 0 ?
-                        PolicyStatusEnum.APPROVED : PolicyStatusEnum.REJECTED
+                        PolicyStatusEnum.VALIDATED : PolicyStatusEnum.REJECTED
         );
 
     }

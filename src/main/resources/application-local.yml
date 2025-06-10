@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8090
 
 aws:
   dynamodb:
@@ -10,9 +10,7 @@ aws:
 
 fraud:
   api:
-    url: "http://localhost:8090"
-
-
+    url: "http://localhost:8080"
 
 
 spring:
@@ -21,7 +19,7 @@ spring:
   jackson:
     property-naming-strategy: SNAKE_CASE
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: localhost:29092
     consumer:
       group-id: order-microservice-group
     properties:

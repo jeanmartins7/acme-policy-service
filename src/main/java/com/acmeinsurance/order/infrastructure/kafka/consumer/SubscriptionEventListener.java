@@ -5,6 +5,7 @@ import com.acmeinsurance.order.domain.service.SubscriptionProcessedService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -19,11 +20,9 @@ public class SubscriptionEventListener {
     private static final Logger log = LoggerFactory.getLogger(SubscriptionEventListener.class);
 
     private final SubscriptionProcessedService subscriptionProcessedService;
+    private final Environment env;
 
-    private static final String SUBSCRIPTION_TOPIC = "${policy.kafka.topics.subscription-events}";
-    private static final String CONSUMER_GROUP_ID = "${spring.kafka.consumer.group-id}";
-
-    @KafkaListener(topics = SUBSCRIPTION_TOPIC, groupId = CONSUMER_GROUP_ID, containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = "${policy.kafka.topics.subscription-events}", groupId = "${spring.kafka.consumer.group-id}", containerFactory = "kafkaListenerContainerFactory")
     public void listenSubscriptionProcessedEvent(
             @Payload SubscriptionProcessedEvent event,
             @Header(KafkaHeaders.RECEIVED_KEY) String key,
@@ -33,11 +32,11 @@ public class SubscriptionEventListener {
             Acknowledgment acknowledgment) {
 
         log.info("Received message from topic '{}', key: '{}', offset: {}, eventType: '{}', Avro Subscription ID: {}",
-                SUBSCRIPTION_TOPIC, key, offset, eventType, event.getPolicyId());
+                env.getProperty("${policy.kafka.topics.subscription-events}"), key, offset, eventType, event.getPolicyId());
 
         if (!"SUBSCRIPTION_PROCESSED".equals(eventType)) {
             log.warn("Discarding message from topic '{}' with non-matching eventType '{}'. Expected: 'SUBSCRIPTION_PROCESSED'. Key: {}",
-                    SUBSCRIPTION_TOPIC, eventType, key);
+                    env.getProperty("${policy.kafka.topics.subscription-events}"), eventType, key);
             acknowledgment.acknowledge();
             return;
         }
