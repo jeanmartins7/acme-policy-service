@@ -8,10 +8,10 @@
         <version>3.3.0</version> <relativePath/>
     </parent>
     <groupId>com.acmeinsurance</groupId>
-    <artifactId>policy-service</artifactId>
+    <artifactId>order-microservice</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>policy-service</name>
-    <description>Policy Management Microservice for ACME Insurance</description>
+    <name>order-microservice</name>
+    <description>Order Management Microservice for ACME Insurance</description>
 
     <properties>
         <java.version>17</java.version>

@@ -1,3 +1,6 @@
+server:
+  port: 8081
+
 aws:
   dynamodb:
     endpoint: "http://localhost:8000"
@@ -10,10 +13,14 @@ fraud:
     url: "http://localhost:8080"
 
 spring:
+  application:
+    name: order-microservice
+  jackson:
+    property-naming-strategy: SNAKE_CASE
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
-      group-id: policy-service-group
+      group-id: order-microservice-group
     properties:
       schema.registry.url: http://localhost:8081
     producer:
@@ -30,3 +37,4 @@ policy:
       status-notifications: "policy-status-notifications-topic"
       payment-events: "payment-confirmed-events-topic"
       subscription-events: "subscription-authorized-events-topic"
+      dead-letter-queue: "policy-dlq-topic"

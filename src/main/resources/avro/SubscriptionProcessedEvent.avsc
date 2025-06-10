@@ -1,11 +1,27 @@
 {
   "type": "record",
-  "name": "SubscriptionAuthorizedEvent",
-  "namespace": "com.acmeinsurance.policy.avro",
+  "name": "SubscriptionProcessedEvent",
+  "namespace": "com.acmeinsurance.order.avro",
   "fields": [
-    {"name": "policyId", "type": {"type": "string", "logicalType": "uuid"}},
-    {"name": "subscriptionId", "type": {"type": "string", "avro.java.string": "String"}},
-    {"name": "authorized", "type": "boolean"},
-    {"name": "authorizationDate", "type": {"type": "long", "logicalType": "timestamp-millis"}}
+    {
+      "name": "policyId",
+      "type": "string",
+      "doc": "The unique identifier of the policy."
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "doc": "The status of the subscription (e.g., ACTIVE, INACTIVE, PENDING)."
+    },
+    {
+      "name": "subscriptionId",
+      "type": "string",
+      "doc": "The unique identifier of the subscription."
+    },
+    {
+      "name": "processedDate",
+      "type": "string", "logicalType": "data",
+      "doc": "The timestamp when the subscription was processed, in milliseconds since the epoch."
+    }
   ]
 }

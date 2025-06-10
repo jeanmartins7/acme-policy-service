@@ -1,5 +1,7 @@
 
 spring:
+  application:
+    name: order-microservice
   profiles:
     active: local
   jackson:

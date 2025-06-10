@@ -1,11 +1,11 @@
 {
   "type": "record",
   "name": "PolicyRejectedEvent",
-  "namespace": "com.acmeinsurance.policy.avro",
+  "namespace": "com.acmeinsurance.order.avro",
   "fields": [
     {"name": "policyId", "type": {"type": "string", "logicalType": "uuid"}},
     {"name": "customerId", "type": {"type": "string", "logicalType": "uuid"}},
-    {"name": "rejectionTimestamp", "type": {"type": "long", "logicalType": "timestamp-millis"}},
-    {"name": "reason", "type": {"type": "string", "avro.java.string": "String"}}
+    {"name": "rejectionTimestamp", "type": {"type": "string", "logicalType": "data"}}
+
   ]
 }
