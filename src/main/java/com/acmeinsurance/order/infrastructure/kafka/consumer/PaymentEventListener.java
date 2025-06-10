@@ -24,12 +24,18 @@ public class PaymentEventListener {
 
     @KafkaListener(topics = "${policy.kafka.topics.payment-events}", groupId = "${spring.kafka.consumer.group-id}", containerFactory = "kafkaListenerContainerFactory")
     public void listenPaymentProcessedEvent(
-                                             @Payload PaymentProcessedEvent event,
-                                             @Header(KafkaHeaders.RECEIVED_KEY) String key,
-                                             @Header(KafkaHeaders.OFFSET) Long offset,
-                                             @Header("eventType") String eventType,
-                                             @Header("eventSourceId") String eventSourceId,
-                                             Acknowledgment acknowledgment) {
+            @Payload PaymentProcessedEvent event,
+            @Header(value = KafkaHeaders.RECEIVED_KEY, required = false) String key,
+            @Header(KafkaHeaders.OFFSET) Long offset,
+            Acknowledgment acknowledgment) {
+
+        final String eventType = event.getEventType();
+
+        if (eventType == null) {
+            log.warn("Received message with missing 'eventType' field in Avro payload. Key: {}", key);
+            acknowledgment.acknowledge();
+            return;
+        }
 
         log.info("Received message from topic '{}', key: '{}', offset: {}, eventType: '{}', Avro Payment ID: {}",
                 env.getProperty("${policy.kafka.topics.payment-events}"), key, offset, eventType, event.getPolicyId());
@@ -41,22 +47,12 @@ public class PaymentEventListener {
             return;
         }
 
-        if (!(event instanceof PaymentProcessedEvent)) {
-            log.error("Received unexpected payload type for eventType '{}'. Expected PaymentProcessedEvent. Payload type: {}. Key: {}",
-                    eventType, event.getClass().getName(), key);
-            acknowledgment.acknowledge();
-            return;
-        }
-
         paymentProcessedService.processPayment(event)
                 .doOnSuccess(policyRequest -> {
                     log.info("Payment processing completed for policyId: {}. New status: {}", policyRequest.getId(), policyRequest.getStatus());
                     acknowledgment.acknowledge();
                 })
-                .doOnError(e -> {
-                    log.error("Error processing payment for policyId {} [key: {}, offset: {}]: {}", event.getPolicyId(), key, offset, e.getMessage());
-
-                })
+                .doOnError(e -> log.error("Error processing payment for policyId {} [key: {}, offset: {}]: {}", event.getPolicyId(), key, offset, e.getMessage()))
                 .subscribe();
     }
 }

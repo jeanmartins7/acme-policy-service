@@ -5,7 +5,8 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.0</version> <relativePath/>
+        <version>3.3.0</version>
+        <relativePath/>
     </parent>
     <groupId>com.acmeinsurance</groupId>
     <artifactId>order-microservice</artifactId>
@@ -20,8 +21,9 @@
         <avro.version>1.11.0</avro.version>
         <build-helper-maven-plugin.version>3.5.0</build-helper-maven-plugin.version>
         <spring-cloud.version>2023.0.1</spring-cloud.version>
-        <confluent.version>7.4.0</confluent.version>
+        <confluent.version>7.9.1</confluent.version>
         <spring-kafka.version>3.0.15</spring-kafka.version>
+        <testcontainers.version>1.19.8</testcontainers.version>
     </properties>
 
     <dependencies>
@@ -81,17 +83,21 @@
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
-            <version>${spring-kafka.version}</version> </dependency>
+            <version>${spring-kafka.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-schema-registry-client</artifactId>
-            <version>${confluent.version}</version> </dependency>
+            <version>${confluent.version}</version>
+        </dependency>
 
+        <!-- https://mvnrepository.com/artifact/io.confluent/kafka-avro-serializer -->
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-avro-serializer</artifactId>
-            <version>${confluent.version}</version> </dependency>
+            <version>7.9.1</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.avro</groupId>
@@ -99,11 +105,33 @@
             <version>${avro.version}</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.jspecify/jspecify -->
         <dependency>
             <groupId>org.jspecify</groupId>
             <artifactId>jspecify</artifactId>
             <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>kafka</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>bom</artifactId>
+            <version>${aws.java.sdk.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
         </dependency>
     </dependencies>
 

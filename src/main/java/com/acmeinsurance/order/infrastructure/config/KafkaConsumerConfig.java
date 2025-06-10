@@ -1,7 +1,6 @@
 package com.acmeinsurance.order.infrastructure.config;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import io.confluent.kafka.serializers.subject.RecordNameStrategy;
 import org.apache.avro.AvroRuntimeException;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -25,6 +24,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.util.backoff.FixedBackOff;
+import org.springframework.web.client.RestClientException;
 
 import java.util.HashMap;
 import java.util.Map;

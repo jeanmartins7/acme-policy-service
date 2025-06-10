@@ -29,22 +29,20 @@ public class KafkaProducerConfig {
 
     @Bean
     public ProducerFactory<String, Object> producerFactory() {
-
         final Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
         configProps.put(SCHEMA_REGISTRY_URL, env.getProperty("spring.kafka.properties.schema.registry.url", "http://localhost:8081"));
         configProps.put("value.subject.name.strategy", RecordNameStrategy.class.getName());
+        configProps.put(ProducerConfig.ACKS_CONFIG, "all");
+        configProps.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
 
         return new DefaultKafkaProducerFactory<>(configProps);
-
     }
 
     @Bean
     public KafkaTemplate<String, Object> kafkaTemplate() {
-
         return new KafkaTemplate<>(producerFactory());
-
     }
 }

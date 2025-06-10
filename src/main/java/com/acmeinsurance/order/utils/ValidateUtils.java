@@ -18,4 +18,12 @@ public class ValidateUtils {
     public static boolean isConfirmed(final String status){
         return StatusEnum.CONFIRMED.equals(StatusEnum.fromValue(status));
     }
+
+    public static boolean isInactived(final String status){
+        return StatusEnum.INACTIVE.equals(StatusEnum.fromValue(status));
+    }
+
+    public static boolean isActived(final String status){
+        return StatusEnum.ACTIVE.equals(StatusEnum.fromValue(status));
+    }
 }

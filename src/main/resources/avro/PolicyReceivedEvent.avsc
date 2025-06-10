@@ -9,8 +9,8 @@
     {"name": "category", "type": {"type": "string", "avro.java.string": "String"}},
     {"name": "salesChannel", "type": {"type": "string", "avro.java.string": "String"}},
     {"name": "paymentMethod", "type": {"type": "string", "avro.java.string": "String"}},
-    {"name": "totalMonthlyPremiumAmount", "type": {"type": "bytes", "logicalType": "decimal", "precision": 10, "scale": 2}},
-    {"name": "insuredAmount", "type": {"type": "bytes", "logicalType": "decimal", "precision": 10, "scale": 2}},
+    {"name": "totalMonthlyPremiumAmount", "type": {"type": "bytes", "logicalType": "decimal", "precision": 14, "scale": 2}},
+    {"name": "insuredAmount", "type": {"type": "bytes", "logicalType": "decimal", "precision": 14, "scale": 2}},
     {"name": "createdAt", "type": {"type": "string", "logicalType": "data"}}
   ]
 }

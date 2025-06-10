@@ -40,6 +40,8 @@ public class PolicyRequestDynamoDbEntity {
     private List<String> assistances;
     private Instant createdAt;
     private Instant finishedAt;
+    private String paymentConfirmed;
+    private String subscriptionAuthorized;
 
     private List<StatusHistoryEntryEntity> history;
 

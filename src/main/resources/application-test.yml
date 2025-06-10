@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8090
 
 aws:
   dynamodb:
@@ -12,17 +12,20 @@ fraud:
   api:
     url: "http://localhost:8080"
 
+
 spring:
   application:
     name: order-microservice
   jackson:
     property-naming-strategy: SNAKE_CASE
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: localhost:29092
     consumer:
       group-id: order-microservice-group
     properties:
-      schema.registry.url: http://localhost:8081
+      schema:
+        registry:
+          url: http://localhost:8081
     producer:
       properties:
         schema.registry.url: http://localhost:8081
@@ -34,7 +37,8 @@ app:
 policy:
   kafka:
     topics:
-      status-notifications: "policy-status-notifications-topic"
-      payment-events: "payment-confirmed-events-topic"
-      subscription-events: "subscription-authorized-events-topic"
-      dead-letter-queue: "policy-dlq-topic"
+      status-notifications: "policy-status-notifications-topic-test"
+      payment-events: "payment-confirmed-events-topic-test"
+      subscription-events: "subscription-authorized-events-topic-test"
+      dead-letter-queue: "policy-dlq-topic-test"
+

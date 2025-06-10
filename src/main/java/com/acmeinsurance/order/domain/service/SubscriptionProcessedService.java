@@ -10,8 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import static com.acmeinsurance.order.utils.ValidateUtils.isActived;
 import static com.acmeinsurance.order.utils.ValidateUtils.isConfirmed;
-import static com.acmeinsurance.order.utils.ValidateUtils.isDenied;
+import static com.acmeinsurance.order.utils.ValidateUtils.isInactived;
 import static com.acmeinsurance.order.utils.ValidateUtils.isRejected;
 
 @Service
@@ -35,7 +36,7 @@ public class SubscriptionProcessedService {
 
                     final PolicyStatusEnum oldStatus = policyRequest.getStatus();
 
-                    if (isDenied(event.getStatus())) {
+                    if (isInactived(event.getStatus())) {
 
                         policyRequest.markSubscriptionAuthorized(false);
 
@@ -44,7 +45,7 @@ public class SubscriptionProcessedService {
                                 PolicyStatusEnum.REJECTED);
                     }
 
-                    if (isConfirmed(event.getStatus())) {
+                    if (isActived(event.getStatus())) {
                         policyRequest.markSubscriptionAuthorized(true);
                     }
 

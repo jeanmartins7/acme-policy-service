@@ -25,11 +25,19 @@ public class SubscriptionEventListener {
     @KafkaListener(topics = "${policy.kafka.topics.subscription-events}", groupId = "${spring.kafka.consumer.group-id}", containerFactory = "kafkaListenerContainerFactory")
     public void listenSubscriptionProcessedEvent(
             @Payload SubscriptionProcessedEvent event,
-            @Header(KafkaHeaders.RECEIVED_KEY) String key,
+            @Header(value = KafkaHeaders.RECEIVED_KEY, required = false) String key,
             @Header(KafkaHeaders.OFFSET) Long offset,
-            @Header("eventType") String eventType,
-            @Header("eventSourceId") String eventSourceId,
             Acknowledgment acknowledgment) {
+
+
+        final String eventType = event.getEventType();
+
+        if (eventType == null) {
+            log.warn("Received message with missing 'eventType' field in Avro payload. Key: {}", key);
+            acknowledgment.acknowledge();
+            return;
+        }
+
 
         log.info("Received message from topic '{}', key: '{}', offset: {}, eventType: '{}', Avro Subscription ID: {}",
                 env.getProperty("${policy.kafka.topics.subscription-events}"), key, offset, eventType, event.getPolicyId());
@@ -37,13 +45,6 @@ public class SubscriptionEventListener {
         if (!"SUBSCRIPTION_PROCESSED".equals(eventType)) {
             log.warn("Discarding message from topic '{}' with non-matching eventType '{}'. Expected: 'SUBSCRIPTION_PROCESSED'. Key: {}",
                     env.getProperty("${policy.kafka.topics.subscription-events}"), eventType, key);
-            acknowledgment.acknowledge();
-            return;
-        }
-
-        if (!(event instanceof SubscriptionProcessedEvent)) {
-            log.error("Received unexpected payload type for eventType '{}'. Expected SubscriptionProcessedEvent. Payload type: {}. Key: {}",
-                    eventType, event.getClass().getName(), key);
             acknowledgment.acknowledge();
             return;
         }

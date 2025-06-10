@@ -22,6 +22,8 @@
       "name": "processedDate",
       "type": "string", "logicalType": "data",
       "doc": "The timestamp when the subscription was processed, in milliseconds since the epoch."
-    }
+    },
+    {"name": "eventType", "type": ["null", {"type": "string", "avro.java.string": "String"}], "default": null},
+    {"name": "eventSourceId", "type": ["null", {"type": "string", "avro.java.string": "String"}], "default": null}
   ]
 }

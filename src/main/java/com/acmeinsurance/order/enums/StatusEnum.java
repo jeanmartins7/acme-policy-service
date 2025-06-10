@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum StatusEnum {
     WAITING("WAITING"),
     CONFIRMED("CONFIRMED"),
+    ACTIVE("ACTIVE"),
+    INACTIVE("INACTIVE"),
     FAILED("FAILED"),
     DENIED("DENIED");
 

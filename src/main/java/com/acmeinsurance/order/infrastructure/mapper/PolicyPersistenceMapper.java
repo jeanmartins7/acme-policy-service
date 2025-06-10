@@ -17,6 +17,8 @@ public interface PolicyPersistenceMapper {
     @Mapping(target = "salesChannel", source = "salesChannel.value")
     @Mapping(target = "paymentMethod", source = "paymentMethod.value")
     @Mapping(target = "status", source = "status.value")
+    @Mapping(target = "paymentConfirmed", source = "paymentConfirmed")
+    @Mapping(target = "subscriptionAuthorized", source = "subscriptionAuthorized")
     PolicyRequestDynamoDbEntity toEntity(PolicyRequest domain);
 
     @Mapping(target = "category", expression = "java(CategoryEnum.fromValue(entity.getCategory()))")

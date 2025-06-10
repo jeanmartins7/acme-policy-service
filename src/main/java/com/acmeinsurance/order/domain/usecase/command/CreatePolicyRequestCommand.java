@@ -25,4 +25,6 @@ public class CreatePolicyRequestCommand {
     private BigDecimal insuredAmount;
     private Map<String, BigDecimal> coverages;
     private List<String> assistances;
+    private String paymentConfirmed;
+    private String subscriptionAuthorized;
 }
