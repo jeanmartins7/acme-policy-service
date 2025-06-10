@@ -2,6 +2,4 @@ target
 .idea
 src/main/resources/docker/clusterID
 src/main/resources/docker/docker-data
-src/main/resources/docker/scripts/create_cluster_id.sh
-src/main/resources/docker/scripts/update_run.sh
-src/main/resources/docker/wiremock/__files
+src/main/resources/docker/scripts
