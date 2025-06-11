@@ -36,12 +36,17 @@ jobs:
           sudo apt-get update && sudo apt-get install -y docker-compose netcat-openbsd
           docker compose -f src/main/resources/docker/docker-compose.yml up -d
 
-      - name: Wait for DynamoDB Local Initialization
-        run: |
-          echo "Waiting for DynamoDB Initializer to complete setup..."
-          # Aumenta o timeout para 300 segundos (5 minutos) para dar mais tempo para o DynamoDB e suas tabelas
-          timeout 300 bash -c 'until docker inspect dynamodb-initializer | grep -q "Exited (0)"; do echo -n "."; sleep 10; done' || { echo "DynamoDB Initializer did not complete successfully. Aborting."; exit 1; }
-          echo "DynamoDB Local and table setup completed by Initializer!"
+  - name: Wait for DynamoDB Local Initialization
+      run: |
+        echo "Waiting for DynamoDB Local to be healthy..."
+        # First, wait for dynamodb-local to report healthy
+        timeout 300 bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} dynamodb-local)" = "healthy" ]; do echo -n "."; sleep 5; done' || { echo "DynamoDB Local did not become healthy. Aborting."; exit 1; }
+        echo "DynamoDB Local is healthy!"
+        
+        echo "Waiting for DynamoDB Initializer to complete setup..."
+        # Give it a moment to start after dynamodb-local is healthy, then check its exit status
+        timeout 300 bash -c 'until docker inspect dynamodb-initializer &>/dev/null && docker inspect dynamodb-initializer | grep -q "Exited (0)"; do echo -n "."; sleep 10; done' || { echo "DynamoDB Initializer did not complete successfully. Aborting."; exit 1; }
+        echo "DynamoDB Local and table setup completed by Initializer!"
 
       - name: Wait for Wiremock to be healthy
         run: |
