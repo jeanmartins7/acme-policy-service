@@ -36,44 +36,4 @@ public enum PolicyStatusEnum {
                 .findFirst()
                 .orElse(UNKNOWN);
     }
-
-    public static PolicyStatusEnum getNewStatus(final PolicyStatusEnum oldStatus, final String paymentConfirmed,
-            final String subscriptionAuthorized) {
-
-        switch (oldStatus) {
-            case VALIDATED:
-                if (StatusEnum.WAITING.equals(StatusEnum.fromValue(paymentConfirmed)) ||
-                        StatusEnum.WAITING.equals(StatusEnum.fromValue(subscriptionAuthorized))) {
-                    return PolicyStatusEnum.PENDING;
-                } else if (StatusEnum.DENIED.equals(StatusEnum.fromValue(paymentConfirmed)) ||
-                           StatusEnum.FAILED.equals(StatusEnum.fromValue(paymentConfirmed))    ||
-                           StatusEnum.DENIED.equals(StatusEnum.fromValue(subscriptionAuthorized)) ||
-                           StatusEnum.FAILED.equals(StatusEnum.fromValue(subscriptionAuthorized))
-                ) {
-                    return PolicyStatusEnum.REJECTED;
-                }
-                break;
-            case PENDING:
-                if (StatusEnum.WAITING.equals(StatusEnum.fromValue(paymentConfirmed)) ||
-                        StatusEnum.WAITING.equals(StatusEnum.fromValue(subscriptionAuthorized))) {
-                    return PolicyStatusEnum.PENDING;
-                } else if (StatusEnum.DENIED.equals(StatusEnum.fromValue(paymentConfirmed)) ||
-                        StatusEnum.FAILED.equals(StatusEnum.fromValue(paymentConfirmed))    ||
-                        StatusEnum.DENIED.equals(StatusEnum.fromValue(subscriptionAuthorized)) ||
-                        StatusEnum.FAILED.equals(StatusEnum.fromValue(subscriptionAuthorized))
-                ) {
-                    return PolicyStatusEnum.REJECTED;
-                } else if(StatusEnum.CONFIRMED.equals(StatusEnum.fromValue(paymentConfirmed)) &&
-                        StatusEnum.CONFIRMED.equals(StatusEnum.fromValue(subscriptionAuthorized))){
-
-                    return PolicyStatusEnum.APPROVED;
-                }
-                break;
-            case RECEIVED:  return PolicyStatusEnum.RECEIVED;
-            case REJECTED:  return PolicyStatusEnum.REJECTED;
-            case APPROVED:  return PolicyStatusEnum.APPROVED;
-            case CANCELLED: return PolicyStatusEnum.CANCELLED;
-        }
-        return oldStatus;
-    }
 }

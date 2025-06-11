@@ -9,6 +9,9 @@ import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.server.ServerWebExchange;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
@@ -47,4 +50,28 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
+
+    @ExceptionHandler(PolicyAlreadyCancelledException.class)
+    public ResponseEntity<Map<String, Object>> handlePolicyAlreadyCancelledException(final PolicyCancelledException ex) {
+
+        return new ResponseEntity<>(getCancelledBody(ex), HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(PolicyCancelledException.class)
+    public ResponseEntity<Map<String, Object>> handlePolicyCancelledException(final PolicyCancelledException ex) {
+
+        return new ResponseEntity<>(getCancelledBody(ex), HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    private static Map<String, Object> getCancelledBody(final PolicyCancelledException ex) {
+
+        final Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
+        body.put("error", HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase());
+        body.put("message", ex.getMessage());
+        body.put("path", "/api/policies/{policyId}");
+        return body;
+    }
+
 }

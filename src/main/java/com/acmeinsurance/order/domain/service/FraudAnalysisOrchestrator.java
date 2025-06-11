@@ -2,9 +2,8 @@ package com.acmeinsurance.order.domain.service;
 
 import com.acmeinsurance.order.domain.model.PolicyRequest;
 import com.acmeinsurance.order.domain.repository.PolicyRequestRepository;
-import com.acmeinsurance.order.domain.strategy.FraudRiskStrategyContext;
-import com.acmeinsurance.order.enums.PolicyStatusEnum;
-import com.acmeinsurance.order.infrastructure.integration.fraud.dto.model.FraudAnalysisResult;
+import com.acmeinsurance.order.domain.strategy.fraudStrategy.FraudRiskStrategyContext;
+import com.acmeinsurance.order.domain.strategy.policyStatusStrategy.PolicyStatusValidationChain;
 import com.acmeinsurance.order.infrastructure.integration.fraud.service.FraudApiService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -17,44 +16,45 @@ import reactor.core.publisher.Mono;
 public class FraudAnalysisOrchestrator {
 
     private static final Logger log = LoggerFactory.getLogger(FraudAnalysisOrchestrator.class);
+    private static final String POLICY_NOT_FOUND_DURING_CRITICAL_ERROR_RECOVERY = "Policy not found during critical error recovery.";
+    private static final String POLICY_NOT_FOUND_DURING_FRAUD_API_ERROR_RECOVERY = "Policy not found during fraud API error recovery.";
+    private static final String API_FRAUD_ANALYSIS_FAILED_FOR_POLICY_ID_MARKING_AS_REJECTED_FOR_SAFETY = "API fraud analysis failed for policyId {}. Marking as REJECTED for safety.";
+    private static final String CRITICAL_UNHANDLED_ERROR_IN_ORCHESTRATION_FOR_POLICY_ID_MARKING_AS_REJECTED_FOR_SAFETY = "Critical unhandled error in orchestration for policyId {}. Marking as REJECTED for safety.";
+    private static final String FRAUD_ANALYSIS_AND_STATUS_UPDATE_COMPLETED_FOR_POLICY_ID_FINAL_STATUS = "Fraud analysis and status update completed for policyId: {}. Final status: {}";
 
     private final PolicyRequestRepository policyRequestRepository;
     private final FraudApiService fraudApiService;
     private final FraudRiskStrategyContext fraudRiskStrategyContext;
+    private final PolicyStatusValidationChain policyStatusValidationChain;
 
     public Mono<PolicyRequest> performAnalysisAndSave(final String policyId) {
         return policyRequestRepository.findById(policyId)
-                .flatMap(policyRequest ->
-                        fraudApiService.analyzePolicyRequest(policyRequest.getId(), policyRequest.getCustomerId())
-                                .flatMap(fraudResult ->
-                                        fraudAnalysis(policyId, policyRequest, fraudResult)
-                                                .doOnSuccess(policyRisk -> policyIsValid(policyRequest, policyRisk))
-                                                .doOnError(e -> log.error("Error during fraud analysis update for policyId {}: {}", policyId, e.getMessage()))
-                                )
-                                .doOnError(e -> log.error("Error during fraud analysis for policyId {}: {}", policyId, e.getMessage()))
-                                .onErrorResume(e -> {
-                                    log.error("Critical error in fraud analysis for policyId {}. Marking as REJECTED for safety.", policyId, e);
-                                    return policyRequestRepository.findById(policyId)
-                                            .flatMap(pr -> policyRequestRepository.updateStatus(pr, pr.getStatus(), PolicyStatusEnum.REJECTED))
-                                            .switchIfEmpty(Mono.error(new RuntimeException("Policy not found during critical error recovery.", e)));
-                                })
-                );
+                .flatMap(this::analyzeAndEvaluateFraud)
+                .doOnSuccess(policyRequest -> log.info(FRAUD_ANALYSIS_AND_STATUS_UPDATE_COMPLETED_FOR_POLICY_ID_FINAL_STATUS,
+                        policyRequest.getId(), policyRequest.getStatus()))
+                .doOnError(e -> log.error("Unhandled error in performAnalysisAndSave for policyId {}: {}", policyId, e.getMessage()))
+                .onErrorResume(e -> handleError(policyId, e,
+                        CRITICAL_UNHANDLED_ERROR_IN_ORCHESTRATION_FOR_POLICY_ID_MARKING_AS_REJECTED_FOR_SAFETY,
+                        POLICY_NOT_FOUND_DURING_CRITICAL_ERROR_RECOVERY));
     }
 
-    private void policyIsValid(final PolicyRequest policyRequest, final PolicyRequest policyRisk) {
-        if (PolicyStatusEnum.VALIDATED.equals(policyRisk.getStatus())) {
-
-            log.info("PolicyRequest {} status updated to {} based on fraud analysis.", policyRequest.getId(), PolicyStatusEnum.PENDING);
-            policyRequestRepository.updateStatus(policyRequest, policyRequest.getStatus(), PolicyStatusEnum.PENDING).subscribe();
-        }
+    private Mono<PolicyRequest> analyzeAndEvaluateFraud(final PolicyRequest policyRequest) {
+        return fraudApiService.analyzePolicyRequest(policyRequest.getId(), policyRequest.getCustomerId())
+                .flatMap(fraudResult -> fraudRiskStrategyContext.evaluate(fraudResult, policyRequest)
+                        .doOnSuccess(policyStatusValidationChain::applyPending))
+                .doOnError(e -> log.error("Error during API fraud analysis for policyId {}: {}", policyRequest.getId(), e.getMessage()))
+                .onErrorResume(e -> handleError(policyRequest.getId().toString(), e,
+                        API_FRAUD_ANALYSIS_FAILED_FOR_POLICY_ID_MARKING_AS_REJECTED_FOR_SAFETY,
+                        POLICY_NOT_FOUND_DURING_FRAUD_API_ERROR_RECOVERY));
     }
 
-    private Mono<PolicyRequest> fraudAnalysis(final String policyId, final PolicyRequest policyRequest, final FraudAnalysisResult fraudResult) {
 
-        log.info("Starting fraud analysis orchestration for policyId: {}", policyId);
-        final PolicyStatusEnum newStatus = fraudRiskStrategyContext.evaluate(fraudResult, policyRequest);
+    private Mono<PolicyRequest> handleError(final String policyId, final Throwable e,
+                                            final String logError, final String message) {
+        log.error(logError, policyId, e);
 
-        log.info("PolicyRequest {} status updated to {} based on fraud analysis.", policyRequest.getId(), newStatus);
-        return policyRequestRepository.updateStatus(policyRequest, policyRequest.getStatus(), newStatus);
+        return policyRequestRepository.findById(policyId)
+                .flatMap(pr -> Mono.just(pr)
+                        .switchIfEmpty(Mono.error(new RuntimeException(message, e))));
     }
 }
