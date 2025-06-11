@@ -1,0 +1,83 @@
+name: CI/CD Pipeline - Policy Service
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17 and Maven
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Cache Maven Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Start Docker Compose Infrastructure (DynamoDB Local & Initializer)
+        run: |
+          sudo apt-get update && sudo apt-get install -y docker-compose netcat-openbsd 
+          docker compose -f src/main/resources/docker/docker-compose.yml up -d 
+
+      - name: Wait for DynamoDB Local Initialization
+        run: |
+          echo "Waiting for DynamoDB Initializer to complete setup..."
+          timeout 180 bash -c 'until docker inspect dynamodb-initializer | grep -q "Exited (0)"; do echo -n "."; sleep 10; done' || { echo "DynamoDB Initializer did not complete successfully. Aborting."; exit 1; }
+          echo "DynamoDB Local and table setup completed by Initializer!"
+
+          echo "Waiting for Kafka to be healthy..."
+          timeout 180 bash -c 'until docker inspect kafka | grep -q "\"Status\": \"healthy\""; do echo -n "."; sleep 10; done' || { echo "Kafka did not become healthy. Aborting."; exit 1; }
+          echo "Kafka is healthy!"
+
+          echo "Waiting for Schema Registry to be healthy..."
+          timeout 180 bash -c 'until docker inspect schema-registry | grep -q "\"Status\": \"healthy\""; do echo -n "."; sleep 10; done' || { echo "Schema Registry did not become healthy. Aborting."; exit 1; }
+          echo "Schema Registry is healthy!"
+
+      - name: Build and Test with Maven
+        run: mvn clean install -Dskip.native.build=true
+
+      - name: Upload JaCoCo Code Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-report
+          path: target/site/jacoco/jacoco.xml
+
+      - name: Stop Docker Compose Infrastructure
+        if: always()
+        run: docker compose -f src/main/resources/docker/docker-compose.yml down
+
+  build-docker-image:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build Native Image with Paketo Buildpacks
+        run: |
+          mvn spring-boot:build-image -Pnative -Dspring-boot.build-image.dockerfile=src/main/resources/docker/Dockerfile -Dspring-boot.build-image.build-context=.
+          echo "Native Image built successfully using Paketo Buildpacks."

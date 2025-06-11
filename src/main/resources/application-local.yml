@@ -1,0 +1,54 @@
+server:
+  port: 8090
+
+aws:
+  dynamodb:
+    endpoint: "http://localhost:8000"
+  region: "us-east-1"
+  accessKeyId: "fakeAccessKeyId"
+  secretAccessKey: "fakeSecretAccessKey"
+
+fraud:
+  api:
+    url: "http://localhost:8080"
+
+
+spring:
+  application:
+    name: order-microservice
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+  kafka:
+    bootstrap-servers: localhost:29092
+    consumer:
+      group-id: order-microservice-group
+    properties:
+      schema:
+        registry:
+          url: http://localhost:8081
+    producer:
+      properties:
+        schema.registry.url: http://localhost:8081
+
+app:
+  event:
+    source-id: "policy-service-instance-01"
+
+policy:
+  kafka:
+    topics:
+      status-notifications: "policy-status-notifications-topic"
+      payment-events: "payment-confirmed-events-topic"
+      subscription-events: "subscription-authorized-events-topic"
+      dead-letter-queue: "policy-dlq-topic"
+
+
+logging:
+  level:
+    com.acmeinsurance.order: DEBUG
+    software.amazon.awssdk: INFO
+    org.springframework.cloud.openfeign: DEBUG
+    org.springframework.kafka: INFO
+    reactor: INFO
+    org.apache.kafka: INFO
+    io.confluent: INFO
