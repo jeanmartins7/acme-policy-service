@@ -1,6 +1,5 @@
-package com.acmeinsurance.order.application.dto.enums;
+package com.acmeinsurance.order.enums;
 
-import com.acmeinsurance.order.enums.PolicyStatusEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
