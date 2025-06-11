@@ -3,14 +3,14 @@ name: CI/CD Pipeline - Policy Service
 on:
   push:
     branches:
-      - dev # Dispara a pipeline em cada push para a branch 'dev'
+      - dev
   pull_request:
     branches:
-      - dev # Dispara a pipeline em cada pull request para a branch 'dev'
+      - dev
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest # O ambiente de execução do GitHub Actions.
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
@@ -20,8 +20,8 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'temurin' # Distribuição Eclipse Temurin (OpenJDK)
-          cache: 'maven' # Cache de dependências Maven para builds mais rápidos
+          distribution: 'temurin'
+          cache: 'maven'
 
       - name: Cache Maven Dependencies
         uses: actions/cache@v4
@@ -31,36 +31,27 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      #- name: Start Docker Compose Infrastructure for Integration Tests
-       # run: |
-       #   sudo apt-get update && sudo apt-get install -y docker-compose
-      #    docker compose -f src/main/resources/docker/docker-compose.yml up -d jaeger prometheus # APENAS Jaeger e Prometheus
+      - name: Start Docker Compose Infrastructure (DynamoDB Local & Initializer)
+        run: |
+          sudo apt-get update && sudo apt-get install -y docker-compose netcat-openbsd 
+          docker compose -f src/main/resources/docker/docker-compose.yml up -d 
 
-      #- name: Wait for Infrastructure to be ready
-      #  run: |
-       #   echo "Waiting for DynamoDB Local (port 8000)..."
-       #   timeout 60 bash -c 'until curl -s http://localhost:8000; do echo -n "."; sleep 5; done' || { echo "DynamoDB Local did not start in time."; exit 1; }
-          
-        #  echo "Waiting for Kafka (port 9092)..."
-       #   timeout 60 bash -c 'until docker exec kafka kafka-topics --bootstrap-server localhost:9092 --list > /dev/null 2>&1; do echo -n "."; sleep 5; done' || { echo "Kafka did not start in time."; exit 1; }
-          
-        #  echo "Waiting for Redis (port 6379)..."
-        #  timeout 60 bash -c 'until docker exec redis redis-cli ping > /dev/null 2>&1; do echo -n "."; sleep 5; done' || { echo "Redis did not start in time."; exit 1; }
+      - name: Wait for DynamoDB Local Initialization
+        run: |
+          echo "Waiting for DynamoDB Initializer to complete setup..."
+          timeout 180 bash -c 'until docker inspect dynamodb-initializer | grep -q "Exited (0)"; do echo -n "."; sleep 10; done' || { echo "DynamoDB Initializer did not complete successfully. Aborting."; exit 1; }
+          echo "DynamoDB Local and table setup completed by Initializer!"
 
-       #   echo "Waiting for Schema Registry (port 8081)..."
-       #   timeout 60 bash -c 'until curl -s http://localhost:8081/subjects > /dev/null 2>&1; do echo -n "."; sleep 5; done' || { echo "Schema Registry did not start in time."; exit 1; }
+          echo "Waiting for Kafka to be healthy..."
+          timeout 180 bash -c 'until docker inspect kafka | grep -q "\"Status\": \"healthy\""; do echo -n "."; sleep 10; done' || { echo "Kafka did not become healthy. Aborting."; exit 1; }
+          echo "Kafka is healthy!"
 
-       #   echo "Waiting for WireMock (port 8080)..."
-      #    timeout 60 bash -c 'until curl -s http://localhost:8080/__admin > /dev/null 2>&1; do echo -n "."; sleep 5; done' || { echo "WireMock did not start in time."; exit 1; }
-          
-       #   echo "Waiting for Jaeger (port 16686)..."
-     #     timeout 60 bash -c 'until curl -s http://localhost:16686/api/services > /dev/null 2>&1; do echo -n "."; sleep 5; done' || { echo "Jaeger did not start in time."; exit 1; }
-          
-      #    echo "All infrastructure services are ready!"
+          echo "Waiting for Schema Registry to be healthy..."
+          timeout 180 bash -c 'until docker inspect schema-registry | grep -q "\"Status\": \"healthy\""; do echo -n "."; sleep 10; done' || { echo "Schema Registry did not become healthy. Aborting."; exit 1; }
+          echo "Schema Registry is healthy!"
 
       - name: Build and Test with Maven
         run: mvn clean install -Dskip.native.build=true
-
 
       - name: Upload JaCoCo Code Coverage Report
         uses: actions/upload-artifact@v4
@@ -68,12 +59,12 @@ jobs:
           name: code-coverage-report
           path: target/site/jacoco/jacoco.xml
 
-    #  - name: Stop Docker Compose Infrastructure
-      #  if: always()
-    #    run: docker-compose down
+      - name: Stop Docker Compose Infrastructure
+        if: always()
+        run: docker compose -f src/main/resources/docker/docker-compose.yml down
 
   build-docker-image:
-    needs: build-and-test # Esta job depende do sucesso da job 'build-and-test'
+    needs: build-and-test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -85,10 +76,8 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
-          
 
       - name: Build Native Image with Paketo Buildpacks
         run: |
-          # **ATENÇÃO: VERIFIQUE SE ESTE COMANDO ESTÁ EXATAMENTE ASSIM NO SEU ARQUIVO**
           mvn spring-boot:build-image -Pnative -Dspring-boot.build-image.dockerfile=src/main/resources/docker/Dockerfile -Dspring-boot.build-image.build-context=.
           echo "Native Image built successfully using Paketo Buildpacks."

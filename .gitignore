@@ -1,2 +1,7 @@
 target
 .idea
+src/main/resources/docker/clusterID
+src/main/resources/docker/docker-data
+src/main/resources/docker/scripts
+src/main/resources/docker/wiremock/*
+!src/main/resources/docker/wiremock/mappings

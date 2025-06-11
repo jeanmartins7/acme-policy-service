@@ -1,4 +1,4 @@
-package com.acmeinsurance.policy; // Seu pacote raiz de testes
+package com.acmeinsurance.order;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
