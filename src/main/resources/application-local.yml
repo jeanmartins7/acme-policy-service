@@ -29,6 +29,11 @@ spring:
     producer:
       properties:
         schema.registry.url: http://localhost:8081
+  main:
+    banner-mode: 'off'
+  native:
+    remove-unused-autoconfig: true
+    remove-yaml-jackson-auto-configurations: true
 
 app:
   event:
@@ -44,6 +49,7 @@ policy:
 
 
 logging:
+  config: classpath:logback-spring.xml
   level:
     com.acmeinsurance.order: DEBUG
     software.amazon.awssdk: INFO

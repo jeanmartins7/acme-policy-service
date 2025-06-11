@@ -45,12 +45,12 @@ public class PolicyReceivedEventListener {
             acknowledgment.acknowledge();
             return;
         }
-
+        //TODO idempotency
         processFraudAnalysisUseCase.execute(event.getPolicyId())
                 .doOnSuccess(policyRequest -> {
                     log.info(LOG_FRAUD_ANALYSIS_COMPLETED, policyRequest.getId(), policyRequest.getStatus());
                     acknowledgment.acknowledge();
-                })
+                })//TODO DLQ
                 .doOnError(e -> log.error(LOG_FRAUD_ANALYSIS_ERROR, event.getPolicyId(), key, offset, e.getMessage(), e))
                 .subscribe();
     }
