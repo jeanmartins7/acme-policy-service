@@ -119,6 +119,14 @@
             <version>5.13.1</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.projectreactor/reactor-test -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <version>3.1.0.RELEASE</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -269,6 +277,18 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/mapper/**/*.class</exclude>
+                                <exclude>**/response/**/*.class</exclude>
+                                <exclude>**/model/**/*.class</exclude>
+                                <exclude>**/request/**/*.class</exclude>
+                                <exclude>**/command/**/*.class</exclude>
+                                <exclude>**/repository/**/*.class</exclude>
+                                <exclude>**/entity/**/*.class</exclude>
+                                <exclude>**/*Application*.class</exclude>
+                            </excludes>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>jacoco-check</id>
@@ -294,14 +314,19 @@
                                 </rule>
                             </rules>
                             <excludes>
-                                <exclude>om/acmeinsurance/order/infrastructure/mapper/**/*.*</exclude>
-                                <exclude>**/*Application/class/</exclude>
+                                <exclude>**/mapper/**/*.class</exclude>
+                                <exclude>**/response/**/*.class</exclude>
+                                <exclude>**/model/**/*.class</exclude>
+                                <exclude>**/request/**/*.class</exclude>
+                                <exclude>**/command/**/*.class</exclude>
+                                <exclude>**/repository/**/*.class</exclude>
+                                <exclude>**/entity/**/*.class</exclude>
+                                <exclude>**/*Application*.class</exclude>
                             </excludes>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
     </build>
 

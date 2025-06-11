@@ -58,12 +58,12 @@ public class PaymentEventListener {
             acknowledgment.acknowledge();
             return Mono.empty();
         }
-
+        //TODO idempotency
         return paymentProcessedService.processPayment(event)
                 .doOnSuccess(policyRequest -> {
                     log.info(LOG_PROCESSING_COMPLETED, policyRequest.getId(), policyRequest.getStatus());
                     acknowledgment.acknowledge();
-                })
+                })//TODO DLQ
                 .doOnError(e -> log.error(LOG_PROCESSING_ERROR, event.getPolicyId(), key, offset, e.getMessage(), e))
                 .then();
     }
