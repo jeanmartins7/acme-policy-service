@@ -19,10 +19,17 @@ public class PolicyReceivedEventListener {
 
     private static final Logger log = LoggerFactory.getLogger(PolicyReceivedEventListener.class);
 
+    private static final String POLICY_RECEIVED_EVENT_TYPE = "RECEIVED";
+    private static final String LOG_TOPIC_PROPERTY = "${policy.kafka.topics.status-notifications}";
+    private static final String LOG_RECEIVED_MESSAGE = "Received message from topic '{}', key: '{}', offset: {}, eventType: '{}', eventSourceId: '{}', Avro Policy ID: {}";
+    private static final String LOG_DISCARDING_EVENT_TYPE_MISMATCH = "Discarding message from topic '{}' with non-matching eventType '{}'. Expected: '{}'. Key: {}";
+     private static final String LOG_FRAUD_ANALYSIS_COMPLETED = "Fraud analysis completed for policyId: {}. New status: {}";
+    private static final String LOG_FRAUD_ANALYSIS_ERROR = "Error processing fraud analysis for policyId {} [key: {}, offset: {}]: {}";
+
     private final ProcessFraudAnalysisUseCase processFraudAnalysisUseCase;
     private final Environment env;
 
-    @KafkaListener(topics = "${policy.kafka.topics.status-notifications}", groupId = "${spring.kafka.consumer.group-id}", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = LOG_TOPIC_PROPERTY, groupId = "${spring.kafka.consumer.group-id}", containerFactory = "kafkaListenerContainerFactory")
     public void listenPolicyReceivedEvent(
             @Payload PolicyReceivedEvent event,
             @Header(KafkaHeaders.RECEIVED_KEY) String key,
@@ -31,32 +38,20 @@ public class PolicyReceivedEventListener {
             @Header("eventSourceId") String eventSourceId,
             Acknowledgment acknowledgment) {
 
-        log.info("Received message from topic '{}', key: '{}', offset: {}, eventType: '{}', eventSourceId: '{}', Avro Policy ID: {}",
-                env.getProperty("${policy.kafka.topics.status-notifications}"), key, offset, eventType, eventSourceId, event.getPolicyId());
+        log.info(LOG_RECEIVED_MESSAGE, env.getProperty(LOG_TOPIC_PROPERTY), key, offset, eventType, eventSourceId, event.getPolicyId());
 
-        if (!"RECEIVED".equals(eventType)) {
-            log.warn("Discarding message from topic '{}' with non-matching eventType '{}'. Expected: 'POLICY_RECEIVED'. Key: {}",
-                    env.getProperty("${policy.kafka.topics.status-notifications}"), eventType, key);
-            acknowledgment.acknowledge();
-            return;
-        }
-
-        if (!(event instanceof PolicyReceivedEvent)) {
-            log.error("Received unexpected payload type for eventType '{}'. Expected PolicyReceivedEvent. Payload type: {}. Key: {}",
-                    eventType, event.getClass().getName(), key);
+        if (!POLICY_RECEIVED_EVENT_TYPE.equals(eventType)) {
+            log.warn(LOG_DISCARDING_EVENT_TYPE_MISMATCH, env.getProperty(LOG_TOPIC_PROPERTY), eventType, POLICY_RECEIVED_EVENT_TYPE, key);
             acknowledgment.acknowledge();
             return;
         }
 
         processFraudAnalysisUseCase.execute(event.getPolicyId())
                 .doOnSuccess(policyRequest -> {
-                    log.info("Fraud analysis completed for policyId: {}. New status: {}", policyRequest.getId(), policyRequest.getStatus());
+                    log.info(LOG_FRAUD_ANALYSIS_COMPLETED, policyRequest.getId(), policyRequest.getStatus());
                     acknowledgment.acknowledge();
                 })
-                .doOnError(e -> {
-                    log.error("Error processing fraud analysis for policyId {} [key: {}, offset: {}]: {}", event.getPolicyId(), key, offset, e.getMessage());
-
-                })
+                .doOnError(e -> log.error(LOG_FRAUD_ANALYSIS_ERROR, event.getPolicyId(), key, offset, e.getMessage(), e))
                 .subscribe();
     }
 }

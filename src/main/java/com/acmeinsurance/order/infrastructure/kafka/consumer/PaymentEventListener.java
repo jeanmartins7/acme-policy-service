@@ -12,6 +12,9 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -19,40 +22,49 @@ public class PaymentEventListener {
 
     private static final Logger log = LoggerFactory.getLogger(PaymentEventListener.class);
 
+    private static final String PAYMENT_PROCESSED_EVENT_TYPE = "PAYMENT_PROCESSED";
+    private static final String LOG_TOPIC_PROPERTY = "${policy.kafka.topics.payment-events}";
+    private static final String LOG_MISSING_EVENT_TYPE = "Received message with missing 'eventType' field in Avro payload. Key: {}";
+    private static final String LOG_RECEIVED_EVENT = "Received event for Policy ID: {}. Key: {}. Offset: {}. EventType: {}. Topic: {}";
+    private static final String LOG_DISCARDING_EVENT = "Discarding event for Policy ID: {} with non-matching EventType: {}. Expected: '{}'.";
+    private static final String LOG_PROCESSING_COMPLETED = "Payment processing completed for Policy ID: {}. New status: {}";
+    private static final String LOG_PROCESSING_ERROR = "Error processing payment for Policy ID: {} (Key: {}, Offset: {}): {}";
+
     private final PaymentProcessedService paymentProcessedService;
     private final Environment env;
 
-    @KafkaListener(topics = "${policy.kafka.topics.payment-events}", groupId = "${spring.kafka.consumer.group-id}", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = LOG_TOPIC_PROPERTY, groupId = "${spring.kafka.consumer.group-id}", containerFactory = "kafkaListenerContainerFactory")
     public void listenPaymentProcessedEvent(
             @Payload PaymentProcessedEvent event,
             @Header(value = KafkaHeaders.RECEIVED_KEY, required = false) String key,
             @Header(KafkaHeaders.OFFSET) Long offset,
             Acknowledgment acknowledgment) {
 
-        final String eventType = event.getEventType();
+        Optional.ofNullable(event.getEventType())
+                .map(eventType -> processValidEvent(event, key, offset, eventType, acknowledgment))
+                .orElseGet(() -> {
+                    log.warn(LOG_MISSING_EVENT_TYPE, key);
+                    acknowledgment.acknowledge();
+                    return Mono.empty();
+                })
+                .subscribe();
+    }
 
-        if (eventType == null) {
-            log.warn("Received message with missing 'eventType' field in Avro payload. Key: {}", key);
+    private Mono<Void> processValidEvent(final PaymentProcessedEvent event, final String key, final Long offset, final String eventType, final Acknowledgment acknowledgment) {
+        log.info(LOG_RECEIVED_EVENT, event.getPolicyId(), key, offset, eventType, env.getProperty(LOG_TOPIC_PROPERTY));
+
+        if (!PAYMENT_PROCESSED_EVENT_TYPE.equals(eventType)) {
+            log.warn(LOG_DISCARDING_EVENT, event.getPolicyId(), eventType, PAYMENT_PROCESSED_EVENT_TYPE);
             acknowledgment.acknowledge();
-            return;
+            return Mono.empty();
         }
 
-        log.info("Received message from topic '{}', key: '{}', offset: {}, eventType: '{}', Avro Payment ID: {}",
-                env.getProperty("${policy.kafka.topics.payment-events}"), key, offset, eventType, event.getPolicyId());
-
-        if (!"PAYMENT_PROCESSED".equals(eventType)) {
-            log.warn("Discarding message from topic '{}' with non-matching eventType '{}'. Expected: 'PAYMENT_PROCESSED'. Key: {}",
-                    env.getProperty("${policy.kafka.topics.payment-events}"), eventType, key);
-            acknowledgment.acknowledge();
-            return;
-        }
-
-        paymentProcessedService.processPayment(event)
+        return paymentProcessedService.processPayment(event)
                 .doOnSuccess(policyRequest -> {
-                    log.info("Payment processing completed for policyId: {}. New status: {}", policyRequest.getId(), policyRequest.getStatus());
+                    log.info(LOG_PROCESSING_COMPLETED, policyRequest.getId(), policyRequest.getStatus());
                     acknowledgment.acknowledge();
                 })
-                .doOnError(e -> log.error("Error processing payment for policyId {} [key: {}, offset: {}]: {}", event.getPolicyId(), key, offset, e.getMessage()))
-                .subscribe();
+                .doOnError(e -> log.error(LOG_PROCESSING_ERROR, event.getPolicyId(), key, offset, e.getMessage(), e))
+                .then();
     }
 }

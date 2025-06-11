@@ -8,6 +8,7 @@ import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class StatusHistoryEntryListConverter implements AttributeConverter<List<StatusHistoryEntryEntity>> {
@@ -15,43 +16,34 @@ public class StatusHistoryEntryListConverter implements AttributeConverter<List<
     private static final TableSchema<StatusHistoryEntryEntity> SCHEMA =
             TableSchema.fromBean(StatusHistoryEntryEntity.class);
 
-    public StatusHistoryEntryListConverter() {}
-
     @Override
     public AttributeValue transformFrom(final List<StatusHistoryEntryEntity> input) {
-        if (input == null) {
-            return AttributeValue.builder().nul(true).build();
-        }
-
-        List<AttributeValue> listAttributeValue = input.stream()
-                .map(item -> AttributeValue.builder().m(SCHEMA.itemToMap(item, true)).build())
-                .collect(Collectors.toList());
-        return AttributeValue.builder().l(listAttributeValue).build();
+        return Optional.ofNullable(input)
+                .map(list -> list.stream()
+                        .map(item -> AttributeValue.builder().m(SCHEMA.itemToMap(item, true)).build())
+                        .collect(Collectors.toList()))
+                .map(AttributeValue.builder()::l)
+                .orElseGet(() -> AttributeValue.builder().nul(true)).build();
     }
 
     @Override
     public List<StatusHistoryEntryEntity> transformTo(final AttributeValue input) {
-        if (input == null || input.l() == null) {
-            return null;
-        }
-
-        return input.l().stream()
-                .map(AttributeValue::m)
-                .map(SCHEMA::mapToItem)
-                .collect(Collectors.toList());
+        return Optional.ofNullable(input)
+                .map(AttributeValue::l)
+                .map(list -> list.stream()
+                        .map(AttributeValue::m)
+                        .map(SCHEMA::mapToItem)
+                        .collect(Collectors.toList()))
+                .orElse(null);
     }
 
     @Override
     public EnhancedType<List<StatusHistoryEntryEntity>> type() {
-
         return EnhancedType.listOf(StatusHistoryEntryEntity.class);
-
     }
 
     @Override
     public AttributeValueType attributeValueType() {
-
         return AttributeValueType.L;
-
     }
 }

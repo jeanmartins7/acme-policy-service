@@ -1,6 +1,5 @@
 package com.acmeinsurance.order.infrastructure.integration.fraud.service;
 
-
 import com.acmeinsurance.order.infrastructure.integration.fraud.client.FraudApiClient;
 import com.acmeinsurance.order.infrastructure.integration.fraud.dto.model.FraudAnalysisResult;
 import com.acmeinsurance.order.infrastructure.integration.fraud.dto.model.Occurrence;
@@ -24,7 +23,6 @@ public class FraudApiService {
     private static final Logger log = LoggerFactory.getLogger(FraudApiService.class);
 
     private final FraudApiClient fraudApiClient;
-
     private final FraudApiMapper fraudApiMapper;
 
     public Mono<FraudAnalysisResult> analyzePolicyRequest(final UUID orderId, final UUID customerId) {
@@ -33,16 +31,17 @@ public class FraudApiService {
         return Mono.fromCallable(() -> fraudApiMapper.toDomain(fraudApiClient.getFraudClassification(orderId, customerId)))
                 .subscribeOn(Schedulers.boundedElastic())
                 .doOnError(e -> log.error("Error calling Fraud API for orderId {}: {}", orderId, e.getMessage()))
-                .onErrorResume(e -> {
-                    log.warn("Fallback: Fraud API failed or returned error for orderId {}.", orderId, e);
-                    return Mono.just(FraudAnalysisResult.builder()
-                            .orderId(orderId)
-                            .customerId(customerId)
-                            .analyzedAt(Instant.now())
-                            .occurrences(Collections.singletonList(Occurrence.builder()
-                                    .description("Fraud API unavailable or error: " + e.getMessage())
-                                    .build()))
-                            .build());
-                });
+                .onErrorResume(e -> Mono.just(createFallbackFraudResult(orderId, customerId, e)));
+    }
+
+    private FraudAnalysisResult createFallbackFraudResult(UUID orderId, UUID customerId, Throwable e) {
+        return FraudAnalysisResult.builder()
+                .orderId(orderId)
+                .customerId(customerId)
+                .analyzedAt(Instant.now())
+                .occurrences(Collections.singletonList(Occurrence.builder()
+                        .description("Fraud API unavailable or error: " + e.getMessage())
+                        .build()))
+                .build();
     }
 }

@@ -30,38 +30,25 @@ public class PolicyEventPublisher {
     private String eventSourceId;
 
     public Mono<Void> publishPolicyReceivedEvent(final PolicyReceivedEvent event, final String eventTypeHeader) {
-        return Mono.fromCallable(() -> {
-
-            final Message<?> message = MessageBuilder.withPayload(event)
-                            .setHeader(KafkaHeaders.KEY, PolicyStatusEnum.RECEIVED.getValue())
-                            .setHeader(KafkaHeaders.TOPIC, statusNotificationsTopic)
-                            .setHeader("eventType", eventTypeHeader)
-                            .setHeader("eventSourceId", eventSourceId)
-                            .build();
-
-                    kafkaTemplate.send(message);
-                    log.info("Published PolicyReceivedEvent for policyId {} to topic {} with eventType header '{}' and eventSourceId '{}'",
-                            event.getPolicyId(), statusNotificationsTopic, eventTypeHeader, eventSourceId);
-                    return null;
-                })
-                .subscribeOn(Schedulers.boundedElastic())
-                .then();
+        return buildAndSend(event, PolicyStatusEnum.RECEIVED.getValue(), eventTypeHeader, event.getPolicyId());
     }
 
     public Mono<Void> publishEventNotificationStatus(final PolicyStatusChangedEvent event, final String eventTypeHeader) {
-        return Mono.fromCallable(() -> {
+        return buildAndSend(event, event.getNewStatus(), eventTypeHeader, event.getPolicyId());
+    }
 
-                    final Message<?> message = MessageBuilder.withPayload(event)
-                            .setHeader(KafkaHeaders.KEY, event.getNewStatus())
+    private Mono<Void> buildAndSend(final Object eventPayload, final String key, final String eventTypeHeader, final CharSequence policyIdForLog) {
+        return Mono.fromCallable(() -> {
+                    Message<?> message = MessageBuilder.withPayload(eventPayload)
+                            .setHeader(KafkaHeaders.KEY, key)
                             .setHeader(KafkaHeaders.TOPIC, statusNotificationsTopic)
                             .setHeader("eventType", eventTypeHeader)
                             .setHeader("eventSourceId", eventSourceId)
                             .build();
 
                     kafkaTemplate.send(message);
-
-                    log.info("Published Update status for policyId {} to topic {} with eventType header '{}' and eventSourceId '{}'",
-                            event.getPolicyId(), statusNotificationsTopic, eventTypeHeader, eventSourceId);
+                    log.info("Published event for policyId {} to topic {} with eventType header '{}' and eventSourceId '{}'",
+                            policyIdForLog, statusNotificationsTopic, eventTypeHeader, eventSourceId);
                     return null;
                 })
                 .subscribeOn(Schedulers.boundedElastic())
