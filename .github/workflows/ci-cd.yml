@@ -1,101 +1,85 @@
-name: CI/CD Pipeline - Policy Service
-
-on:
-  push:
-    branches:
-      - dev
-  pull_request:
-    branches:
-      - dev
-
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+    steps: # Esta linha 'steps:' está na coluna 5 (4 espaços de indentação)
+      - name: Checkout Code # O hífen '-' está na coluna 7 (6 espaços de indentação)
+        uses: actions/checkout@v4 # 'uses:' está na coluna 9 (8 espaços de indentação)
 
-      - name: Set up JDK 17 and Maven
-        uses: actions/setup-java@v4
-        with:
+      - name: Set up JDK 17 and Maven # '-' na coluna 7
+        uses: actions/setup-java@v4 # 'uses:' na coluna 9
+        with: # 'with:' na coluna 9
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Cache Maven Dependencies
-        uses: actions/cache@v4
-        with:
+      - name: Cache Maven Dependencies # '-' na coluna 7
+        uses: actions/cache@v4 # 'uses:' na coluna 9
+        with: # 'with:' na coluna 9
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Start Docker Compose Infrastructure
-        run: |
+      - name: Start Docker Compose Infrastructure # '-' na coluna 7
+        run: | # 'run:' na coluna 9
           sudo apt-get update && sudo apt-get install -y docker-compose netcat-openbsd
           docker compose -f src/main/resources/docker/docker-compose.yml up -d
 
-  - name: Wait for DynamoDB Local Initialization
-      run: |
-        echo "Waiting for DynamoDB Local to be healthy..."
-        # First, wait for dynamodb-local to report healthy
-        timeout 300 bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} dynamodb-local)" = "healthy" ]; do echo -n "."; sleep 5; done' || { echo "DynamoDB Local did not become healthy. Aborting."; exit 1; }
-        echo "DynamoDB Local is healthy!"
-        
-        echo "Waiting for DynamoDB Initializer to complete setup..."
-        # Give it a moment to start after dynamodb-local is healthy, then check its exit status
-        timeout 300 bash -c 'until docker inspect dynamodb-initializer &>/dev/null && docker inspect dynamodb-initializer | grep -q "Exited (0)"; do echo -n "."; sleep 10; done' || { echo "DynamoDB Initializer did not complete successfully. Aborting."; exit 1; }
-        echo "DynamoDB Local and table setup completed by Initializer!"
+      - name: Wait for DynamoDB Local Initialization # '-' na coluna 7
+        run: | # 'run:' na coluna 9
+          echo "Waiting for DynamoDB Local to be healthy..."
+          timeout 300 bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} dynamodb-local)" = "healthy" ]; do echo -n "."; sleep 5; done' || { echo "DynamoDB Local did not become healthy. Aborting."; exit 1; }
+          echo "DynamoDB Local is healthy!"
 
-      - name: Wait for Wiremock to be healthy
-        run: |
+          echo "Waiting for DynamoDB Initializer to complete setup..."
+          timeout 300 bash -c 'until docker inspect dynamodb-initializer &>/dev/null && docker inspect dynamodb-initializer | grep -q "Exited (0)"; do echo -n "."; sleep 10; done' || { echo "DynamoDB Initializer did not complete successfully. Aborting."; exit 1; }
+          echo "DynamoDB Local and table setup completed by Initializer!"
+
+      - name: Wait for Wiremock to be healthy # ESTA LINHA DEVE COMEÇAR COM O HÍFEN '-' NA COLUNA 7
+        run: | # 'run:' na coluna 9
           echo "Waiting for Wiremock to be healthy..."
           timeout 120 bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} wiremock)" = "healthy" ]; do echo -n "."; sleep 5; done' || { echo "Wiremock did not become healthy. Aborting."; exit 1; }
           echo "Wiremock is healthy!"
 
-      - name: Wait for Kafka and Schema Registry to be ready
-        run: |
+      - name: Wait for Kafka and Schema Registry to be ready # '-' na coluna 7
+        run: | # 'run:' na coluna 9
           echo "Waiting for Kafka and Schema Registry..."
-          # Espera o Control Center ficar saudável, que por sua vez depende de Kafka e Schema Registry
           timeout 300 bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} control-center)" = "healthy" ]; do echo -n "."; sleep 10; done' || { echo "Kafka or Schema Registry did not become healthy. Aborting."; exit 1; }
           echo "Kafka and Schema Registry are ready!"
 
-      - name: Build and Run Unit/Integration Tests with Maven
-        run: mvn clean install -Dskip.native.build=true
+      - name: Build and Run Unit/Integration Tests with Maven # '-' na coluna 7
+        run: mvn clean install -Dskip.native.build=true # 'run:' na coluna 9
 
-      - name: Run End-to-End (E2E) Tests
-        run: mvn integration-test -Pnative -Dspring-boot.build-image.dockerfile=src/main/resources/docker/Dockerfile -Dspring-boot.build-image.build-context=.
+      - name: Run End-to-End (E2E) Tests # '-' na coluna 7
+        run: mvn integration-test -Pnative -Dspring-boot.build-image.dockerfile=src/main/resources/docker/Dockerfile -Dspring-boot.build-image.build-context=. # 'run:' na coluna 9
 
 
-      - name: Upload JaCoCo Code Coverage Report
-        uses: actions/upload-artifact@v4
-        with:
+      - name: Upload JaCoCo Code Coverage Report # '-' na coluna 7
+        uses: actions/upload-artifact@v4 # 'uses:' na coluna 9
+        with: # 'with:' na coluna 9
           name: code-coverage-report
           path: target/site/jacoco/jacoco.xml
 
-      - name: Stop Docker Compose Infrastructure
-        if: always()
-        run: docker compose -f src/main/resources/docker/docker-compose.yml down
+      - name: Stop Docker Compose Infrastructure # '-' na coluna 7
+        if: always() # 'if:' na coluna 9
+        run: docker compose -f src/main/resources/docker/docker-compose.yml down # 'run:' na coluna 9
 
-  build-docker-image:
+  build-docker-image: # Este job está no mesmo nível de indentação de 'build-and-test'
     needs: build-and-test
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
+    steps: # 'steps:' aqui também na coluna 5
+      - name: Checkout Code # '-' na coluna 7
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 17 # '-' na coluna 7
         uses: actions/setup-java@v4
-        with:
+        with: # 'with:' na coluna 9
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Build Native Image with Paketo Buildpacks
-        run: |
-          # Use o profile `native` que você já tem configurado para o build da imagem.
-          # O `-Dspring-boot.build-image.dockerfile` e `-Dspring-boot.build-image.build-context` são desnecessários aqui,
-          # pois o plugin spring-boot-maven-plugin já sabe como construir a imagem.
+      - name: Build Native Image with Paketo Buildpacks # '-' na coluna 7
+        run: | # 'run:' na coluna 9
           mvn spring-boot:build-image -Pnative
           echo "Native Image built successfully using Paketo Buildpacks."
