@@ -237,13 +237,6 @@
                             <goal>repackage</goal>
                         </goals>
                     </execution>
-                    <execution>
-                        <id>build-native</id>
-                        <goals>
-                            <goal>build-image</goal>
-                        </goals>
-                        <phase>package</phase>
-                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -384,6 +377,15 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>build-native-binary-in-docker</id>
+            <properties>
+                <spring-boot.build-image.skip>true</spring-boot.build-image.skip>
+            </properties>
+        </profile>
+    </profiles>
 
     <repositories>
         <repository>

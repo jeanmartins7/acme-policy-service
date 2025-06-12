@@ -148,8 +148,8 @@ services:
     volumes:
       - "./otel:/etc:rw"
     ports:
-      - "13133:13133" # health check
-      - "4318:4318" # OTLP HTTP
+      - "13133:13133"
+      - "4318:4318"
     depends_on:
       - jaeger
     healthcheck:

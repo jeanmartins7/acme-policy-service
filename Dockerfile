@@ -1,22 +1,31 @@
-FROM container-registry.oracle.com/graalvm/native-image:17 AS builder
-FROM vegardit/graalvm-maven:17.0.9 AS build
+
+FROM eclipse-temurin:17-jdk-jammy AS build
 
 WORKDIR /app
 
+
+ENV JAVA_HOME="/opt/java/openjdk"
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+
 COPY pom.xml .
 
+
 COPY src ./src
+
 
 COPY mvnw .
 COPY .mvn .mvn
 
-RUN ./mvnw clean package -Pnative -DskipTests
 
-FROM container-registry.oracle.com/os/oraclelinux:9-slim as git
+RUN ./mvnw clean package -Pnative -DskipTests -Dspring-boot.build-image.skip=true
 
-FROM container-registry.oracle.com/os/oraclelinux:9-slim
+
+FROM alpine/glibc
+
 
 WORKDIR /app
+
 
 COPY --from=builder /app/target/*.jar ./app.jar
 COPY --from=builder /app/target/order-microservice-0.0.1-SNAPSHOT.jar ./order-microservice-0.0.1-SNAPSHOT.jar
