@@ -48,6 +48,19 @@ policy:
       dead-letter-queue: "policy-dlq-topic"
 
 
+
+otel:
+  service:
+    name: ${spring.application.name}
+  traces:
+    exporter: otlp
+  exporter:
+    otlp:
+      endpoint: http://collector:4318
+      traces:
+        protocol: http/protobuf
+
+
 logging:
   config: classpath:logback-spring.xml
   level:

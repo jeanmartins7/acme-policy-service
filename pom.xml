@@ -127,6 +127,48 @@
             <version>3.1.0.RELEASE</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-observation</artifactId>
+            <version>1.13.0</version> </dependency>
+
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-otel</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-sdk</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-exporter-otlp</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-context</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.opentelemetry.instrumentation/opentelemetry-reactor-3.1 -->
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-reactor-3.1</artifactId>
+            <version>2.16.0-alpha</version>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.opentelemetry.instrumentation/opentelemetry-spring-boot-starter -->
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-spring-boot-starter</artifactId>
+            <version>2.16.0</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -151,6 +193,11 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.graalvm.buildtools</groupId>
+                <artifactId>native-maven-plugin</artifactId>
+                <version>0.9.20</version>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
@@ -159,6 +206,14 @@
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                         </exclude>
+                        <exclusion>
+                            <groupId>org.springframework</groupId>
+                            <artifactId>spring-webmvc</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-web</artifactId>
+                        </exclusion>
                     </excludes>
                     <image>
                         <builder>paketobuildpacks/builder-jammy-tiny:latest</builder>
@@ -169,7 +224,7 @@
                                 -Dspring.profiles.active=native
                             </BP_MAVEN_BUILD_ARGUMENTS>
                             <BP_NATIVE_IMAGE_BUILD_ARGUMENTS>
-                                --initialize-at-run-time=org.slf4j,ch.qos.logback,io.netty,software.amazon.awssdk.http.nio.netty.internal.utils.BetterBytes
+                                --initialize-at-run-time=org.slf4j,ch.qos.logback,io.netty,software.amazon.awssdk.http.nio.netty.internal.utils.BetterBytes,org.springframework.aop,org.springframework.context.index,org.springframework.data.mongodb.core.mapping
                                 --allow-incomplete-classpath
                                 -H:+ReportExceptionStackTraces
                             </BP_NATIVE_IMAGE_BUILD_ARGUMENTS>
@@ -332,6 +387,25 @@
 
     <repositories>
         <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>spring-snapshots</id>
+            <name>Spring Snapshots</name>
+            <url>https://repo.spring.io/snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
             <id>maven-central</id>
             <url>https://repo.maven.apache.org/maven2</url>
             <releases>
@@ -357,6 +431,17 @@
             <url>https://repo.spring.io/milestone</url>
             <snapshots>
                 <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>spring-snapshots</id>
+            <name>Spring Snapshots</name>
+            <url>https://repo.spring.io/snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
