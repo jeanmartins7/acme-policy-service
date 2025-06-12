@@ -159,6 +159,19 @@ services:
       start_period: 10s
       timeout: 3s
 
+  order-microservice:
+    image: order-microservice:latest
+    container_name: order-microservice
+    ports:
+      - "8090:8090"
+    depends_on:
+      collector:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+    networks:
+      - default
+
 
 
 volumes:

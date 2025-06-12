@@ -48,33 +48,18 @@ policy:
       dead-letter-queue: "policy-dlq-topic"
 
 
-receivers:
-  otlp:
-    protocols:
-      http:
-        endpoint: 0.0.0.0:4318
-      grpc:
-        endpoint: 0.0.0.0:4317
 
-exporters:
-  debug:
+otel:
+  service:
+    name: ${spring.application.name}
+  traces:
+    exporter: otlp
+  exporter:
+    otlp:
+      endpoint: http://collector:4318
+      traces:
+        protocol: http/protobuf
 
-  otlp:
-    endpoint: "jaeger:4317"
-    tls:
-      insecure: true
-
-processors:
-  batch:
-    timeout: 1s
-    send_batch_size: 512
-
-service:
-  pipelines:
-    traces:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [otlp, debug]
 
 logging:
   config: classpath:logback-spring.xml
