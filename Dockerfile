@@ -1,22 +1,39 @@
-FROM container-registry.oracle.com/graalvm/native-image:17 AS builder
-FROM vegardit/graalvm-maven:17.0.9 AS build
 
+FROM eclipse-temurin:17-jdk-jammy AS build
+
+# Define o diretório de trabalho dentro do contêiner
 WORKDIR /app
 
+# Define explicitamente JAVA_HOME e adiciona o binário Java ao PATH.
+# Com base no seu log de depuração, 'which java' aponta para /opt/java/openjdk/bin/java.
+# Portanto, JAVA_HOME deve ser /opt/java/openjdk.
+ENV JAVA_HOME="/opt/java/openjdk"
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+# Copia o arquivo pom.xml para que as dependências possam ser baixadas primeiro
 COPY pom.xml .
 
+# Copia o código fonte da aplicação
 COPY src ./src
 
+# Copia o Maven Wrapper e sua pasta de configuração
 COPY mvnw .
 COPY .mvn .mvn
 
-RUN ./mvnw clean package -Pnative -DskipTests
+# Compila a aplicação para gerar o EXECUTÁVEL NATIVO.
+# Os comandos de diagnóstico anteriores confirmaram o problema, agora devem ser removidos.
+# -Pnative: Ativa o perfil nativo para compilação GraalVM.
+# -DskipTests: Pula a execução dos testes.
+# -Dspring-boot.build-image.skip=true: ESSENCIAL - Diz ao plugin Spring Boot para NÃO construir a imagem Docker.
+RUN ./mvnw clean package -Pnative -DskipTests -Dspring-boot.build-image.skip=true
 
-FROM container-registry.oracle.com/os/oraclelinux:9-slim as git
+# Estágio de execução: Usa uma imagem base mínima para rodar o executável nativo
+FROM alpine/glibc
 
-FROM container-registry.oracle.com/os/oraclelinux:9-slim
-
+# Define o diretório de trabalho
 WORKDIR /app
+
+
 
 COPY --from=builder /app/target/*.jar ./app.jar
 COPY --from=builder /app/target/order-microservice-0.0.1-SNAPSHOT.jar ./order-microservice-0.0.1-SNAPSHOT.jar
