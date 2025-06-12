@@ -1,5 +1,5 @@
-# Usa uma imagem base Java 17 leve para aplicações Spring Boot
-FROM eclipse-temurin:17-jdk-jammy
+FROM container-registry.oracle.com/graalvm/native-image:17 AS builder
+FROM vegardit/graalvm-maven:17.0.9 AS build
 
 WORKDIR /app
 
@@ -12,14 +12,14 @@ COPY .mvn .mvn
 
 RUN ./mvnw clean package -Pnative -DskipTests
 
-FROM alpine/git as git
+FROM container-registry.oracle.com/os/oraclelinux:9-slim as git
 
-FROM alpine/glibc
+FROM container-registry.oracle.com/os/oraclelinux:9-slim
 
 WORKDIR /app
 
 COPY --from=builder /app/target/*.jar ./app.jar
-COPY --from=builder /app/target/order-microservice ./order-microservice
+COPY --from=builder /app/target/order-microservice-0.0.1-SNAPSHOT.jar ./order-microservice-0.0.1-SNAPSHOT.jar
 
 COPY src/main/resources/application.yml ./config/application.yml
 COPY src/main/resources/application-local.yml ./config/application-local.yml
