@@ -29,6 +29,8 @@ spring:
     producer:
       properties:
         schema.registry.url: http://localhost:8081
+        spring.json.add.type.headers: true
+
   main:
     banner-mode: 'off'
   native:

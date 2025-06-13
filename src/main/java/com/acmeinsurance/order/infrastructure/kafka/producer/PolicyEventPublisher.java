@@ -43,6 +43,7 @@ public class PolicyEventPublisher {
                             .setHeader(KafkaHeaders.KEY, key)
                             .setHeader(KafkaHeaders.TOPIC, statusNotificationsTopic)
                             .setHeader("eventType", eventTypeHeader)
+                            .setHeader("__TypeId__", eventPayload.getClass().getName())
                             .setHeader("eventSourceId", eventSourceId)
                             .build();
 
