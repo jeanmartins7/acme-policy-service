@@ -47,9 +47,19 @@ policy:
       subscription-events: "subscription-authorized-events-topic"
       dead-letter-queue: "policy-dlq-topic"
 
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    metrics:
+      endpoint: http://collector:4318/v1/metrics
+    traces:
+      endpoint: http://collector:4318/v1/traces
+    logs:
+      endpoint: http://collector:4318/v1/logs
 
-
-otel:
+otlp:
   service:
     name: ${spring.application.name}
   traces:
