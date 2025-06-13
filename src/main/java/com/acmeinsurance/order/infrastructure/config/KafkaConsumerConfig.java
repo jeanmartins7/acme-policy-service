@@ -99,7 +99,8 @@ public class KafkaConsumerConfig {
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory(
             final DefaultErrorHandler errorHandler,
-            @Qualifier("myMessageFilterStrategy") RecordFilterStrategy<String, Object> filterStrategy) {
+            @Qualifier("myMessageFilterStrategy") RecordFilterStrategy<String, Object> filterStrategyReciver,
+            @Qualifier("genericSchemaFilterStrategy") RecordFilterStrategy<String, Object> filterStrategy) {
 
         final ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
@@ -108,6 +109,7 @@ public class KafkaConsumerConfig {
         factory.getContainerProperties().setAckMode(AckMode.MANUAL_IMMEDIATE);
         factory.setCommonErrorHandler(errorHandler);
         factory.setRecordFilterStrategy(filterStrategy);
+        factory.setRecordFilterStrategy(filterStrategyReciver);
         return factory;
     }
 }
