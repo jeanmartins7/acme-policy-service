@@ -6,3 +6,6 @@ spring:
     active: local
   jackson:
     property-naming-strategy: SNAKE_CASE
+  cloud:
+    compatibility-verifier:
+      enabled: false

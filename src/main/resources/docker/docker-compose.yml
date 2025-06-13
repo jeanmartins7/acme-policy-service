@@ -7,7 +7,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - "./docker-data:/home/dynamodblocal/data"
+      - "./docker-data:/home/dynamodblocal/data:rw"
     working_dir: /home/dynamodblocal
     healthcheck:
       test: [ "CMD-SHELL", '[ "$(curl -s -o /dev/null -I -w ''%{http_code}'' http://localhost:8000)" == "400" ]' ]
@@ -19,18 +19,44 @@ services:
     depends_on:
       dynamodb-local:
         condition: service_healthy
-    image: amazon/aws-cli
+    build:
+      context: .
+      dockerfile: dynamodb-initializer.Dockerfile
     volumes:
-      - "./schemas:/tmp/dynamo"
+      - "./schemas:/tmp/dynamo:rw"
     environment:
       AWS_ACCESS_KEY_ID: 'FAKEID'
       AWS_SECRET_ACCESS_KEY: 'FAKEKEY'
       AWS_REGION: 'us-east-1'
     entrypoint:
-      - bash
+      - sh
     command:
-      '-c "for f in /tmp/dynamo/*.json; do aws dynamodb create-table --endpoint-url "http://dynamodb-local:8000" --cli-input-json file://"$${f#./}"; done"'
+      - -c
+      - |
+        set -x
+        echo "Waiting for dynamodb-local to be ready..."
+        while ! nc -z dynamodb-local 8000; do
+          sleep 1;
+        done;
+        echo "dynamodb-local is ready. Starting table creation/check."
 
+        for f in /tmp/dynamo/*.json; do
+          TABLE_NAME=$$(jq -r '.TableName' "$$f");
+
+          if [ -z "$$TABLE_NAME" ]; then
+            echo "Error: Could not extract TableName from $$f. Skipping this file.";
+            continue;
+          fi
+
+          if aws dynamodb describe-table --table-name "$$TABLE_NAME" --endpoint-url "http://dynamodb-local:8000" 2>/dev/null; then
+            echo "Table $$TABLE_NAME already exists. Skipping creation.";
+          else
+            echo "Creating table $$TABLE_NAME...";
+            aws dynamodb create-table --endpoint-url "http://dynamodb-local:8000" --cli-input-json file://"$${f}";
+            echo "Finished creating table $$TABLE_NAME."
+          fi;
+        done
+        echo "DynamoDB initialization complete."
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -142,35 +168,37 @@ services:
 
 
   collector:
-    image: otel/opentelemetry-collector-contrib:0.102.1
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: collector
     restart: unless-stopped
-    command: ["--config=/etc/otel-collector-config.yaml"]
+    command: ["--config=/etc/otlp-collector-config.yaml"]
     volumes:
-      - "./otel:/etc:rw"
-    ports:
+      - ./otlp/otlp-collector-config.yaml:/etc/otlp-collector-config.yaml
       - "13133:13133"
+      - "4317:4317"
       - "4318:4318"
+      - "8888:8888"
     depends_on:
       - jaeger
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:13133"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8888/metrics || exit 1"]
       interval: 5s
       retries: 10
       start_period: 10s
       timeout: 3s
 
-  order-microservice:
-    image: order-microservice:latest
-    container_name: order-microservice
-    ports:
-      - "8090:8090"
-    depends_on:
-      collector:
-        condition: service_healthy
-    environment:
-      SPRING_PROFILES_ACTIVE: local
-    networks:
-      - default
+  #order-microservice:
+    #image: order-microservice:latest
+    #container_name: order-microservice
+    #ports:
+      #- "8090:8090"
+    #depends_on:
+      #collector:
+        #condition: service_healthy
+    #environment:
+      #SPRING_PROFILES_ACTIVE: local
+    #networks:
+      #- default
 
 
 

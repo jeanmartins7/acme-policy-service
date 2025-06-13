@@ -5,5 +5,5 @@ src/main/resources/docker/docker-data
 src/main/resources/docker/scripts
 src/main/resources/docker/wiremock/*
 !src/main/resources/docker/wiremock/mappings
-src/main/resources/docker/otel/*
-!src/main/resources/docker/otel/otel-collector-config.yaml
+src/main/resources/docker/otlp/*
+!src/main/resources/docker/otlp/otlp-collector-config.yaml
