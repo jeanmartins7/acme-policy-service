@@ -155,7 +155,6 @@ services:
       timeout: 5s
       retries: 5
 
-
   jaeger:
     image: jaegertracing/all-in-one:1.57
     environment:
@@ -165,7 +164,6 @@ services:
       - "14268:14268"
       - "14250:14250"
       - "9411:9411"
-
 
   collector:
     image: otel/opentelemetry-collector-contrib:latest
