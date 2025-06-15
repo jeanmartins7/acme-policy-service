@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPattern": "/api/fraudes/solicitacoes/.*/clientes/.*"
+    "urlPattern": "/api/fraudes/solicitacoes/.*/clientes/ae8294cc-431d-4995-a03b-905b806feb8f"
   },
   "response": {
     "status": 200,
@@ -15,7 +15,7 @@
       "classification": "REGULAR",
       "occurrences": [
         {
-          "id": "{{randomValue type='UUID'}}",
+          "id": "11ea16e9-d50e-4e56-bfbf-f769f8f080ef",
           "productId": 12345,
           "type": "NONE",
           "description": "No fraud detected",

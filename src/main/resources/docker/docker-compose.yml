@@ -166,24 +166,62 @@ services:
       - "9411:9411"
 
   collector:
-    image: otel/opentelemetry-collector-contrib:latest
+    image: otel/opentelemetry-collector-contrib:0.104.0
     container_name: collector
     restart: unless-stopped
-    command: ["--config=/etc/otlp-collector-config.yaml"]
+    command: ["--config=/etc/otel-collector-config.yaml"]
     volumes:
-      - ./otlp/otlp-collector-config.yaml:/etc/otlp-collector-config.yaml
+      - "./otel/otel-collector-config.yaml:/etc/otel-collector-config.yaml"
+    ports:
       - "13133:13133"
       - "4317:4317"
       - "4318:4318"
       - "8888:8888"
+      - "9464:9464"
     depends_on:
       - jaeger
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8888/metrics || exit 1"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:4318/ || exit 1"]
       interval: 5s
       retries: 10
       start_period: 10s
       timeout: 3s
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - "./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "prometheus_data:/prometheus"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=false'
+      - '--web.console.templates=false'
+      - '--web.enable-remote-write-receiver'
+    depends_on:
+      - collector
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:9090/-/healthy || exit 1" ]
+      interval: 5s
+      retries: 10
+      start_period: 10s
+      timeout: 3s
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - "grafana_data:/var/lib/grafana "
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
 
   #order-microservice:
     #image: order-microservice:latest
@@ -201,6 +239,9 @@ services:
 
 
 volumes:
+  dynamodb_data:
+  prometheus_data:
+  grafana_data:
   kafka-data:
     driver: local
 

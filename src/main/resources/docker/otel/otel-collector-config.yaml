@@ -6,22 +6,21 @@ receivers:
       grpc:
         endpoint: 0.0.0.0:4317
 
+processors:
+extensions:
+  health_check: {}
 exporters:
-  debug:
-
   otlp:
-    endpoint: "jaeger:4317"
+    endpoint: jaeger:4317
     tls:
       insecure: true
-
-processors:
-  batch:
-    timeout: 1s
-    send_batch_size: 512
-
+  prometheus:
+    endpoint: "0.0.0.0:9090"
 service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [batch]
-      exporters: [otlp, debug]
+      exporters: [otlp]
+    metrics:
+      receivers: [otlp]
+      exporters: [prometheus]
