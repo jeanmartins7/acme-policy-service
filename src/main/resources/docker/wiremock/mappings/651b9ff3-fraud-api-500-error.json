@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPattern": "/api/fraudes/solicitacoes/.*/clientes/customer-that-fails"
+    "urlPattern": "/api/fraudes/solicitacoes/.*/clientes/651b9ff3-0231-40f8-a0b4-2453bcede54b"
   },
   "response": {
     "status": 500,

@@ -29,7 +29,6 @@ spring:
     producer:
       properties:
         schema.registry.url: http://localhost:8081
-        spring.json.add.type.headers: true
 
   main:
     banner-mode: 'off'
@@ -60,17 +59,6 @@ management:
       endpoint: http://collector:4318/v1/traces
     logs:
       endpoint: http://collector:4318/v1/logs
-
-otlp:
-  service:
-    name: ${spring.application.name}
-  traces:
-    exporter: otlp
-  exporter:
-    otlp:
-      endpoint: http://collector:4318
-      traces:
-        protocol: http/protobuf
 
 
 logging:
