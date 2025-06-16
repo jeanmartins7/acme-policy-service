@@ -9,3 +9,4 @@ src/main/resources/docker/otel/*
 !src/main/resources/docker/otel/otel-collector-config.yaml
 src/main/resources/docker/prometheus/*
 !src/main/resources/docker/prometheus/prometheus.yml
+src/main/resources/docker/data

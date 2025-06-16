@@ -1,7 +1,17 @@
 global:
-  scrape_interval: 5s
+  scrape_interval: 15s
+  evaluation_interval: 15s
 
 scrape_configs:
   - job_name: 'otel-collector'
+    scrape_interval: 5s
     static_configs:
-      - targets: ['otel-collector:9090']
+      - targets: ['collector:9464']
+        labels:
+          application: 'order-microservice'
+          environment: 'development'
+
+  - job_name: 'prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['localhost:9090']

@@ -10,17 +10,23 @@ processors:
 extensions:
   health_check: {}
 exporters:
+  logging:
+    loglevel: debug
   otlp:
     endpoint: jaeger:4317
     tls:
       insecure: true
   prometheus:
-    endpoint: "0.0.0.0:9090"
+    endpoint: "0.0.0.0:9464"
+
 service:
   pipelines:
     traces:
       receivers: [otlp]
-      exporters: [otlp]
+      exporters: [logging, otlp]
     metrics:
       receivers: [otlp]
-      exporters: [prometheus]
+      exporters: [logging, prometheus]
+    logs:
+      receivers: [otlp]
+      exporters: [logging]
